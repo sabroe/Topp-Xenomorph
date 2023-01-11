@@ -1,0 +1,5 @@
+rootProject.name = 'Yelstream Topp Xenomorph Gradle Plugin Project'
+
+includeBuild 'Gradle-Tool'
+
+include 'Example'

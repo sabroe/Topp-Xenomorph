@@ -1,0 +1,4 @@
+rootProject.name = 'Topp Xenomorph Gradle Plugin'
+
+include 'Topp-Xenomorph-Jakarta-JAXB-Library'
+include 'Topp-Xenomorph-Gradle-Plugin'
