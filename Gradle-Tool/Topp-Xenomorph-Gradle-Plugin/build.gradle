@@ -2,7 +2,6 @@ plugins {
     id 'java-gradle-plugin'
     id 'jacoco'
     id 'maven-publish'
-//                                                                                                                                                                  id 'signing'
 
     id "com.gradle.plugin-publish" version "1.1.0" //https://plugins.gradle.org/docs/publish-plugin
 }
@@ -26,6 +25,16 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.6'
 
 //    api 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+
+    //See https://eclipse-ee4j.github.io/jaxb-ri/ !
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+    implementation 'jakarta.activation:jakarta.activation-api:2.1.0'
+    implementation 'org.eclipse.angus:angus-activation:1.0.0'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+    implementation 'com.sun.xml.bind:jaxb-core:4.0.1'
+    implementation 'com.sun.xml.bind:jaxb-impl:4.0.1'
+    implementation 'com.sun.xml.bind:jaxb-xjc:4.0.1'  //XJC
+    implementation 'com.sun.xml.bind:jaxb-jxc:4.0.1'  //SchemaGen
 }
 
 java {

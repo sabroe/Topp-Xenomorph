@@ -11,17 +11,23 @@ import com.yelstream.topp.gradle.oggy.task.StripTask;
 import com.yelstream.topp.gradle.oggy.task.VisualizeTask;
 import com.yelstream.topp.gradle.util.jsonschema2pojo.JsonSchema2PojoPluginUtility;
 */
+import com.sun.tools.xjc.Driver;
+import com.sun.tools.xjc.XJCFacade;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.file.FileTreeElement;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.tasks.Exec;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.Jar;
 
 import java.io.File;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * The "Xenomorph" Gradle plugin addressing Jakarta JAXB.
@@ -71,5 +77,38 @@ public class XenomorphPlugin implements Plugin<Project> {
             jarTask.from(new File(buildDir,"oggy/json-schema/normalized"));
         });
         */
+
+
+        project.getTasks().create("xjc", Exec.class, task -> {
+//            task.setCommandLine("xjc", "-d", project.getProjectDir() + "/generated-sources", project.getProjectDir() + "/src/main/resources/schema.xsd");
+//            List<String> args=List.of("-version");
+//            List<String> args=List.of("-fullversion");
+            List<String> args=List.of("-help");
+            try {
+                int status=Driver.run(args.toArray(new String[0]),System.out,null/*System.err*/);
+                task.setIgnoreExitValue(true);
+                task.setDidWork(true);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        });
+
+        project.getTasks().create("schemagen", Exec.class, task -> {
+//            task.setCommandLine("schemagen", project.getProjectDir() + "/src/main/java/com/example/model/*.java");
+
+//            List<String> args=List.of("-version");
+            List<String> args=List.of("-fullversion");
+            try {
+                int status=Driver.run(args.toArray(new String[0]),System.out,null/*System.err*/);
+                task.setIgnoreExitValue(true);
+                task.setDidWork(true);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        });
+
+
     }
 }

@@ -4,7 +4,7 @@ plugins {
 //    id 'maven-publish'
 //    id 'signing'
 
-    id 'com.yelstream.topp.xenomorph' version '2.0.0'
+    id 'com.yelstream.topp.xenomorph' version '0.0.1'
 }
 
 dependencies {
