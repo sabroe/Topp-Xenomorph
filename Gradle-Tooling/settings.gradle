@@ -1,0 +1,4 @@
+rootProject.name = 'Yelstream Topp Xenomorph Gradle Tooling Project'
+
+include 'Topp-Xenomorph-Jakarta-JAXB-Library'
+include 'Topp-Xenomorph-Gradle-Plugin'
