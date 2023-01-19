@@ -9,6 +9,7 @@ plugins {
 
 javadoc {
     exclude 'urn/iso/std/iso/_20022/**'
+    exclude 'net/gexf/**'
 //    options.addBooleanOption('Xdoclint:none', true)
 }
 
@@ -16,6 +17,7 @@ sourceSets {
     checkstyle {
         java {
             exclude 'urn/iso/std/iso/_20022/**'
+            exclude 'net/gexf/**'
         }
     }
 }

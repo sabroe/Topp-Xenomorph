@@ -1,0 +1,49 @@
+<!DOCTYPE catalog
+  PUBLIC "-//OASIS//DTD XML Catalogs V1.1//EN"
+         "http://www.oasis-open.org/committees/entity/release/1.1/catalog.dtd">
+<catalog
+    xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"
+    prefer="public"
+>
+<!--
+    <public publicId="-//W3C//DTD XMLSCHEMA 200102//EN"
+            uri="s4s/XMLSchema.dtd" />
+    <system systemId="http://www.w3.org/2001/xml.xsd"
+            uri="xml.xsd" />
+    <system systemId="http://gexf.net/1.3"
+            uri="../xsd/Graph-Exchange-XML/1.3/XSD/dynamic.xsd" />
+    <system systemId="http://gexf.net/1.3"
+            uri="../xsd/Graph-Exchange-XML/1.3/XSD/dynamic.xsd" />
+-->
+XXX
+    <uri
+        name="dynamic.xsd"
+        uri="../xsd/Graph-Exchange-XML/1.3/XSD/dynamic.xsd"
+    />
+
+    <system
+        systemId="dynamic.xsd"
+        uri="../xsd/Graph-Exchange-XML/1.3/XSD/dynamic.xsd"
+    />
+
+    <public
+        publicId="viz.xsd"
+        uri="../xsd/Graph-Exchange-XML/1.3/XSD/viz.xsd"
+    />
+
+    <public
+        publicId="viz.xsd"
+        uri="../xsd/Graph-Exchange-XML/1.3/XSD/viz.xsd"
+    />
+
+    <uri
+        name="viz.xsd"
+        uri="../xsd/Graph-Exchange-XML/1.3/XSD/viz.xsd"
+    />
+
+    <system
+        systemId="viz.xsd"
+        uri="../xsd/Graph-Exchange-XML/1.3/XSD/viz.xsd"
+    />
+
+</catalog>

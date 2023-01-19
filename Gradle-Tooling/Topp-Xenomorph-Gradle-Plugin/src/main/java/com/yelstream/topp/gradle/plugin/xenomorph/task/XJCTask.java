@@ -197,17 +197,44 @@ public abstract class XJCTask extends DefaultTask {
                 Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
                 Files.createDirectories(generatedFilesDirectory);
 
-                Path bindingFilesDirectory=projectDir.resolve(Paths.get("src","main","resources","xjb"));
+                Path bindingFilesDirectory1=projectDir.resolve(Paths.get("src","main","resources","xjb","mapping.xjb"));
+//                Path bindingFilesDirectory=projectDir.resolve(Paths.get("src","main","resources","xjb"));
+                Path bindingFilesDirectory2=projectDir.resolve(Paths.get("src","main","resources","xjb","Graph-Exchange-XML/1.1/mapping.xjb"));
+                Path bindingFilesDirectory3=projectDir.resolve(Paths.get("src","main","resources","xjb","Graph-Exchange-XML/1.2/mapping.xjb"));
+                Path bindingFilesDirectory4=projectDir.resolve(Paths.get("src","main","resources","xjb","Graph-Exchange-XML/1.3/mapping.xjb"));
 //                Files.createDirectories(generatedFilesDirectory);
 
-                Path schemaFile=projectDir.resolve(Paths.get("src","main","resources","xsd","pain.001.001.02.xsd"));
+                Path schemaFile1=projectDir.resolve(Paths.get("src","main","resources","xsd","pain.001.001.02.xsd"));
+                Path schemaFile2=projectDir.resolve(Paths.get("src","main","resources","xsd","Graph-Exchange-XML/1.1/XSD/gexf.xsd"));
+                Path schemaFile3=projectDir.resolve(Paths.get("src","main","resources","xsd","Graph-Exchange-XML/1.2/XSD/gexf.xsd"));
+                Path schemaFile4=projectDir.resolve(Paths.get("src","main","resources","xsd","Graph-Exchange-XML/1.3/XSD/gexf.xsd"));
 //                Files.createDirectories(generatedFilesDirectory);
+
+                Path catalogFile=projectDir.resolve(Paths.get("src","main","resources","cat","catalog.cat"));
+if (!Files.exists(catalogFile)) {
+    throw new IllegalStateException();
+}
+
+/*
+                Add -Dxml.catalog.verbosity=999 as a command line option to Ant/Maven.
+*/
 
                 List<String> args=
                     List.of(
                             "-d",generatedFilesDirectory.toAbsolutePath().toString(),
-                            schemaFile.toAbsolutePath().toString(),
-                            "-b",bindingFilesDirectory.toAbsolutePath().toString(),
+//                            "-catalog",catalogFile.toAbsolutePath().toString(),
+//                            "-verbose",
+
+                            schemaFile1.toAbsolutePath().toString(),
+//                            schemaFile2.toAbsolutePath().toString(),
+                            schemaFile3.toAbsolutePath().toString(),
+//                            schemaFile4.toAbsolutePath().toString(),
+
+                            "-b",bindingFilesDirectory1.toAbsolutePath().toString(),
+//                            "-b",bindingFilesDirectory2.toAbsolutePath().toString(),
+                            "-b",bindingFilesDirectory3.toAbsolutePath().toString(),
+//                            "-b",bindingFilesDirectory4.toAbsolutePath().toString(),
+
                             "-mark-generated",
                             "-enableIntrospection"
                            );
