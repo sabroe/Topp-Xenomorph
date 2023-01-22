@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+   targetNamespace="http://graphml.graphdrawing.org/xmlns"
+   xmlns="http://graphml.graphdrawing.org/xmlns"  
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+   elementFormDefault="qualified"
+   attributeFormDefault="unqualified"
+>
+
+<xs:import namespace="http://www.w3.org/1999/xlink"
+           schemaLocation="xlink.xsd"/>
+
+<xs:redefine 
+    schemaLocation="http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+
+  <xs:attributeGroup name="node.extra.attrib">
+    <xs:attributeGroup ref="node.extra.attrib"/>
+    <xs:attribute ref="xlink:href" use="optional"/>
+  </xs:attributeGroup>
+
+</xs:redefine>
+
+</xs:schema>

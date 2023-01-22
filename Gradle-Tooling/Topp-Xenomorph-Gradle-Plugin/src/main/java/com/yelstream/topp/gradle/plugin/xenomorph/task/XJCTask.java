@@ -2,6 +2,7 @@ package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
 import com.sun.tools.xjc.Driver;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
+import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtension;
 import com.yelstream.topp.gradle.plugin.xenomorph.util.XenomorphPluginUtility;
 import com.yelstream.topp.grind.gradle.api.Projects;
 import com.yelstream.topp.grind.gradle.api.Tasks;
@@ -28,6 +29,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -151,11 +153,12 @@ public abstract class XJCTask extends DefaultTask {
     @TaskAction
     public void run() throws TaskExecutionException {
         Project project=getProject();
+        Logger logger=project.getLogger();
+        Tasks.logHello(this);
+
         File buildDir=project.getBuildDir();
         Path buildDirectoryPath=project.getBuildDir().toPath();
 
-        Logger logger=project.getLogger();
-        Tasks.logHello(this);
 
 
         Map<String,Object> projectProperties=Projects.getProjectProperties(project);
@@ -183,31 +186,24 @@ public abstract class XJCTask extends DefaultTask {
             {
 //                File rootDir=project.getRootDir();
                 Path projectDir=project.getProjectDir().toPath();
-/*
-//                Path output=projectDir.resolve(Paths.get("build","xenomorph","xxx"));
-                Path output=projectDir.resolve(Paths.get("build","xenomorph","json-schema","xjc"));
-//                Path output=projectDir.resolve(Paths.get("src","main","java"));
-                Path d=Files.createDirectories(output);
-                Path a=d.toAbsolutePath();
-                System.out.println(a);
-
-//                Path generatedFilesDirectory=projectDir.resolve(Paths.get("build/xenomorph/xxx"));
-//                Path generatedFilesDirectory=projectDir.resolve(Paths.get("src/main/java"));
-*/
                 Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
                 Files.createDirectories(generatedFilesDirectory);
 
-                Path bindingFilesDirectory1=projectDir.resolve(Paths.get("src","main","resources","xjb","mapping.xjb"));
+//                Path bindingFilesDirectory1=projectDir.resolve(Paths.get("src","main","resources","xjb","mapping.xjb"));
 //                Path bindingFilesDirectory=projectDir.resolve(Paths.get("src","main","resources","xjb"));
                 Path bindingFilesDirectory2=projectDir.resolve(Paths.get("src","main","resources","xjb","Graph-Exchange-XML/1.1/mapping.xjb"));
                 Path bindingFilesDirectory3=projectDir.resolve(Paths.get("src","main","resources","xjb","Graph-Exchange-XML/1.2/mapping.xjb"));
                 Path bindingFilesDirectory4=projectDir.resolve(Paths.get("src","main","resources","xjb","Graph-Exchange-XML/1.3/mapping.xjb"));
+//                Path bindingFilesDirectory5=projectDir.resolve(Paths.get("src","main","resources","xjb","GraphML/mapping.xjb"));
 //                Files.createDirectories(generatedFilesDirectory);
 
-                Path schemaFile1=projectDir.resolve(Paths.get("src","main","resources","xsd","pain.001.001.02.xsd"));
+//                Path schemaFile1=projectDir.resolve(Paths.get("src","main","resources","xsd","pain.001.001.02.xsd"));
                 Path schemaFile2=projectDir.resolve(Paths.get("src","main","resources","xsd","Graph-Exchange-XML/1.1/XSD/gexf.xsd"));
                 Path schemaFile3=projectDir.resolve(Paths.get("src","main","resources","xsd","Graph-Exchange-XML/1.2/XSD/gexf.xsd"));
                 Path schemaFile4=projectDir.resolve(Paths.get("src","main","resources","xsd","Graph-Exchange-XML/1.3/XSD/gexf.xsd"));
+                Path schemaFile5=projectDir.resolve(Paths.get("src","main","resources","xsd","GraphML/graphml.xsd"));
+//                Path schemaFile51=projectDir.resolve(Paths.get("src","main","resources","xsd","GraphML/graphml-parseinfo.xsd"));
+//                Path schemaFile52=projectDir.resolve(Paths.get("src","main","resources","xsd","GraphML/graphml-attributes.xsd"));
 //                Files.createDirectories(generatedFilesDirectory);
 
                 Path catalogFile=projectDir.resolve(Paths.get("src","main","resources","cat","catalog.cat"));
@@ -216,37 +212,128 @@ if (!Files.exists(catalogFile)) {
 }
 
 /*
-                Add -Dxml.catalog.verbosity=999 as a command line option to Ant/Maven.
+    Add -Dxml.catalog.verbosity=999 as a command line option to Ant/Maven.
+*/
+/*
+    -Djavax.xml.accessExternalSchema=all
+    -Djavax.xml.accessExternalSchema=file,http
+    //https://docs.oracle.com/javase/tutorial/jaxp/properties/properties.html
+ */
+
+/*
+    DGML
+    GraphML
+    XGMML
+    PhyloXML
+    NeXML
 */
 
                 List<String> args=
                     List.of(
                             "-d",generatedFilesDirectory.toAbsolutePath().toString(),
-//                            "-catalog",catalogFile.toAbsolutePath().toString(),
+                            "-catalog",catalogFile.toAbsolutePath().toString(),
 //                            "-verbose",
 
-                            schemaFile1.toAbsolutePath().toString(),
+//                            schemaFile1.toAbsolutePath().toString(),
 //                            schemaFile2.toAbsolutePath().toString(),
                             schemaFile3.toAbsolutePath().toString(),
 //                            schemaFile4.toAbsolutePath().toString(),
+//                            schemaFile5.toAbsolutePath().toString(),
+//                            schemaFile51.toAbsolutePath().toString(),
+//                            schemaFile52.toAbsolutePath().toString(),
 
-                            "-b",bindingFilesDirectory1.toAbsolutePath().toString(),
+//                            "-b",bindingFilesDirectory1.toAbsolutePath().toString(),
 //                            "-b",bindingFilesDirectory2.toAbsolutePath().toString(),
                             "-b",bindingFilesDirectory3.toAbsolutePath().toString(),
 //                            "-b",bindingFilesDirectory4.toAbsolutePath().toString(),
+//                            "-b",bindingFilesDirectory5.toAbsolutePath().toString(),
 
                             "-mark-generated",
                             "-enableIntrospection"
                            );
-                run(args,null);
+//                run(args,null);
 
                 //project.get
             }
 
 
+            XJCExtension e=XJCExtension.get(project);
+            List<XJCExtension.Run> runs=e.getRuns();
 
+            if (runs==null || runs.isEmpty()) {
+                logger.warn("Nothing to do!");
+            } else {
+                for (XJCExtension.Run run: runs) {
+                    executeRun(run);
+                }
+            }
         } catch (Exception ex) {
             throw new TaskExecutionException(this,ex);
+        }
+    }
+
+    private void executeRun(XJCExtension.Run run) throws Exception {
+        Project project=getProject();
+        Logger logger=project.getLogger();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(String.format("Run is named %s!",run.getName()),run);
+        }
+
+        XJCExtension.Run.Options options=run.getOptions();
+        XJCExtension.Run.Extensions extensions=run.getExtensions();
+
+        File buildDir=project.getBuildDir();
+        Path buildDirectoryPath=project.getBuildDir().toPath();
+        Path projectDir=project.getProjectDir().toPath();
+
+        List<String> args=new ArrayList<>();
+
+        Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
+
+        args.add("-d");
+        args.add(generatedFilesDirectory.toAbsolutePath().toString());
+
+        if (options.getTargetPackage()!=null) {
+            args.add("-p");
+            args.add(options.getTargetPackage());
+        }
+
+        if (options.getCatalogFile()!=null) {
+            args.add("-catalog");
+            Path catalogPath=options.getCatalogFile().toPath();
+            args.add(catalogPath.toAbsolutePath().toString());
+        }
+
+        if (run.getSchema()!=null) {
+            List<String> schemas=run.getSchema();
+            for (String schema: schemas) {
+                Path schemaFile=projectDir.resolve(Paths.get(schema));
+                args.add(schemaFile.toAbsolutePath().toString());
+            }
+        }
+
+        if (options.getBindingFile()!=null) {
+            List<File> bindingFiles=options.getBindingFile();
+            for (File binding: bindingFiles) {
+                Path bindingPath=binding.toPath();
+                Path bindingFilesDirectory=projectDir.resolve(bindingPath);
+                args.add("-b");
+                args.add(bindingFilesDirectory.toAbsolutePath().toString());
+            }
+        }
+
+        if (extensions.getMarkGenerated()!=Boolean.FALSE) {
+            args.add("-mark-generated");
+        }
+        if (options.getEnableIntrospection()!=Boolean.FALSE) {
+            args.add("-enableIntrospection");
+        }
+
+System.err.println("Run: "+args);
+//        run(args,null);
+        if (run.getEnable()!=Boolean.FALSE) {
+            run(args);
         }
     }
 
@@ -271,5 +358,11 @@ if (!Files.exists(catalogFile)) {
 
 //     ./bin/xjc.bat -b mapping.xjb -mark-generated -enableIntrospection pain.001.001.02.xsd
 
+
+    /*
+JAXBContext jaxbContext = JAXBContext.newInstance(packageName);
+Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+Graphml graphml= (Graphml) jaxbUnmarshaller.unmarshal(xmlFile);
+     */
 
 }

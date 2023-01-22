@@ -1,0 +1,41 @@
+
+<bindings
+        xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+<!--
+  <bindings schemaLocation="../../xsd/GraphML/graphml.xsd">
+    <schemaBindings>
+      <package name="org.graphdrawing.graphml._1_0"/>
+    </schemaBindings>
+  </bindings>
+-->
+<!--
+  <bindings schemaLocation="../../xsd/GraphML/graphml-structure.xsd">
+    <schemaBindings>
+      <package name="org.graphdrawing.graphml._1_0.structure"/>
+    </schemaBindings>
+  </bindings>
+-->
+<!--
+  <bindings schemaLocation="http://graphml.graphdrawing.org/xmlns">
+    <schemaBindings>
+      <package name="org.graphdrawing.graphml._1_0"/>
+    </schemaBindings>
+  </bindings>
+-->
+  <bindings node="//xs:schema[@targetNamespace='http://graphml.graphdrawing.org/xmlns']//*">
+    <schemaBindings>
+      <package name="org.graphdrawing.graphml._1_0"/>
+    </schemaBindings>
+  </bindings>
+<!--
+  <bindings node="//@*[namespace-uri()='http://graphml.graphdrawing.org/xmlns']/Graph">
+    <schemaBindings>
+      <package name="org.graphdrawing.graphml._1_0"/>
+    </schemaBindings>
+  </bindings>
+-->
+
+
+</bindings>

@@ -15,7 +15,8 @@
     <system systemId="http://gexf.net/1.3"
             uri="../xsd/Graph-Exchange-XML/1.3/XSD/dynamic.xsd" />
 -->
-XXX
+
+<!--
     <uri
         name="dynamic.xsd"
         uri="../xsd/Graph-Exchange-XML/1.3/XSD/dynamic.xsd"
@@ -45,5 +46,18 @@ XXX
         systemId="viz.xsd"
         uri="../xsd/Graph-Exchange-XML/1.3/XSD/viz.xsd"
     />
+
+<xs:redefine schemaLocation="http://graphml.graphdrawing.org/xmlns/1.1/graphml-structure.xsd">
+-->
+
+    <uri
+        name="http://graphml.graphdrawing.org/xmlns/1.1/graphml-structure.xsd"
+        uri="../xsd/GraphML/graphml-structure.xsd"
+    />
+    <uri
+        name="http://graphml.graphdrawing.org/xmlns/1.1/xlink.xsd"
+        uri="../xsd/GraphML/xlink.xsd"
+    />
+
 
 </catalog>

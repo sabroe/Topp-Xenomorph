@@ -2,7 +2,7 @@
 <bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0">
   <bindings schemaLocation="../xsd/pain.001.001.02.xsd">
     <schemaBindings>
-      <package name="urn.iso.std.iso._20022.tech.pain_001_001_02"/>
+      <package name="org.iso.std.iso._20022.tech.pain_001_001_02"/>
     </schemaBindings>
   </bindings>
 </bindings>
