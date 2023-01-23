@@ -2,7 +2,9 @@ package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
 import com.sun.tools.xjc.Driver;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
+import com.yelstream.topp.gradle.plugin.xenomorph.extension.SchemaGenExtension;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtension;
+import com.yelstream.topp.gradle.plugin.xenomorph.util.SchemaReference;
 import com.yelstream.topp.gradle.plugin.xenomorph.util.XenomorphPluginUtility;
 import com.yelstream.topp.grind.gradle.api.Projects;
 import com.yelstream.topp.grind.gradle.api.Tasks;
@@ -267,6 +269,9 @@ if (!Files.exists(catalogFile)) {
                     executeRun(run);
                 }
             }
+
+//            System.err.println("SchemaGenExtension: "+ SchemaGenExtension.get(project));
+
         } catch (Exception ex) {
             throw new TaskExecutionException(this,ex);
         }
@@ -305,11 +310,15 @@ if (!Files.exists(catalogFile)) {
             args.add(catalogPath.toAbsolutePath().toString());
         }
 
-        if (run.getSchema()!=null) {
-            List<String> schemas=run.getSchema();
-            for (String schema: schemas) {
+        if (run.getSourceSchema()!=null) {
+            List<SchemaReference> schemas=run.getSourceSchema();
+            for (SchemaReference schema: schemas) {
+                String schemaText=schema.resolve(project);
+                args.add(schemaText);
+/*
                 Path schemaFile=projectDir.resolve(Paths.get(schema));
                 args.add(schemaFile.toAbsolutePath().toString());
+*/
             }
         }
 
@@ -331,7 +340,7 @@ if (!Files.exists(catalogFile)) {
         }
 
 System.err.println("Run: "+args);
-//        run(args,null);
+        run(args,null);
         if (run.getEnable()!=Boolean.FALSE) {
             run(args);
         }

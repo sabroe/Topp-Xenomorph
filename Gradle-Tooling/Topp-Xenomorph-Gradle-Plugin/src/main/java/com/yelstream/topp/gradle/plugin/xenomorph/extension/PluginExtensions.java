@@ -30,9 +30,9 @@ public class PluginExtensions {
 
     public static PluginExtensions register(ExtensionContainer extensions) {
         Builder builder=builder();
-        builder.xenomorphExtension(extensions.create(XenomorphExtension.EXTENSION_NAME,XenomorphExtension.class));
         builder.xjcExtension(extensions.create(XJCExtension.EXTENSION_NAME,XJCExtension.class));
         builder.schemaGenExtension(extensions.create(SchemaGenExtension.EXTENSION_NAME,SchemaGenExtension.class));
+        builder.xenomorphExtension(extensions.create(XenomorphExtension.EXTENSION_NAME,XenomorphExtension.class));  //Yes, create this last!
         return builder.build();
     }
 }

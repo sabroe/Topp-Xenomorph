@@ -1,5 +1,7 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.extension;
 
+import com.yelstream.topp.gradle.plugin.xenomorph.util.SchemaReference;
+import com.yelstream.topp.gradle.plugin.xenomorph.util.SchemaReferenceFactory;
 import groovy.lang.Closure;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,7 +41,10 @@ public class XJCExtension {
 
         private String name;
         private Boolean enable;
-        private List<String> schema=new ArrayList<>();
+
+        private Boolean dry;
+
+        private List<SchemaReference> sourceSchema=new ArrayList<>();
 
         //Arguments: Complete argument line!
         //Arguments: Prepend prefix!
@@ -120,11 +125,5 @@ public class XJCExtension {
         return run;
     }
 
-/*
-    private String modules;  //Eh?
-
-    private String schemaFileName;  //Eh?
-
-    private String schemaFileDefinitionsName;  //Eh?
-*/
+    private SchemaReferenceFactory schema=new SchemaReferenceFactory();
 }

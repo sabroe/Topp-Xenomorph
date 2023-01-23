@@ -1,7 +1,8 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.extension;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.yelstream.topp.gradle.api.ResourceFactory;
+import lombok.Getter;
+import org.gradle.api.Project;
 
 /**
  *
@@ -10,19 +11,27 @@ import lombok.NoArgsConstructor;
  * @version 1.0
  * @since 2023-01-14
  */
-@Data
-@NoArgsConstructor
 public class XenomorphExtension {
     /**
      * Extension name as used in Gradle build files.
      */
     public static final String EXTENSION_NAME="xenomorph";
 
-/*
-    private String modules;  //Eh?
+    public XenomorphExtension(Project project) {
+        this.project=project;
+        resource=new ResourceFactory(project);
+        xjc=XJCExtension.get(project);
+        schemaGen=SchemaGenExtension.get(project);
+    }
 
-    private String schemaFileName;  //Eh?
+    private final Project project;
 
-    private String schemaFileDefinitionsName;  //Eh?
-*/
+    @Getter
+    private final ResourceFactory resource;
+
+    @Getter
+    private final XJCExtension xjc;
+
+    @Getter
+    private final SchemaGenExtension schemaGen;
 }
