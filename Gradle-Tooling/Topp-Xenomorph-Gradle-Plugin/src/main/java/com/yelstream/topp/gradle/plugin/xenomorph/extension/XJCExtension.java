@@ -35,14 +35,19 @@ public class XJCExtension {
 
     private final Project project;
 
+    private boolean enable=true;
+
+    private boolean dry;
+
     @Data
     @NoArgsConstructor
     public class Run {
 
         private String name;
-        private Boolean enable;
 
-        private Boolean dry;
+        private boolean enable=true;
+
+        private boolean dry;
 
         private List<SchemaReference> sourceSchema=new ArrayList<>();
 
@@ -54,8 +59,8 @@ public class XJCExtension {
         @NoArgsConstructor
         public static class Options {
 
-            private Boolean nv;
-            private Boolean extension;
+            private boolean nv;
+            private boolean extension;
             private List<File> bindingFile=new ArrayList<>();
 
             private File outputDirectory;
@@ -65,11 +70,11 @@ public class XJCExtension {
 
             private Boolean enableIntrospection;
 
-            private Boolean verbose;
-            private Boolean quiet;
-            private Boolean help;
-            private Boolean version;
-            private Boolean fullversion;
+            private boolean verbose;
+            private boolean quiet;
+            private boolean help;
+            private boolean version;
+            private boolean fullversion;
         }
 
         @Data

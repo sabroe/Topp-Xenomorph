@@ -29,7 +29,7 @@ xenomorph {
 //        resourceDir = project.file('src/main/resources')
         run {
             name = 'Test generation of ISO 20022 XML Schema'
-            enable = false
+            enable = true
             sourceSchema += schema.of(resource.file('xsd/pain.001.001.02.xsd'))
             options {
                 bindingFile += resource.file('xjb/mapping.xjb')
@@ -39,7 +39,7 @@ xenomorph {
         }
         run {
             name = 'Test generation of GraphML XML Schema'
-            enable = false
+            enable = true
             sourceSchema += schema.of(resource.file('xsd/GraphML/graphml-parseinfo.xsd'))
             sourceSchema += schema.of(resource.file('xsd/GraphML/graphml-attributes.xsd'))
             options {
@@ -51,7 +51,7 @@ xenomorph {
         }
         run {
             name = 'Test generation of GEXF XML Schema'
-            enable = false
+            enable = true
             sourceSchema += schema.of(resource.file('xsd/Graph-Exchange-XML/1.2/XSD/gexf.xsd'))
             options {
                 bindingFile += resource.file('xjb/Graph-Exchange-XML/1.2/mapping.xjb')

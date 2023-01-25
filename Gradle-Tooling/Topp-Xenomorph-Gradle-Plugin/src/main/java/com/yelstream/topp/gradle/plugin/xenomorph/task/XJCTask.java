@@ -1,13 +1,15 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
-import com.sun.tools.xjc.Driver;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
-import com.yelstream.topp.gradle.plugin.xenomorph.extension.SchemaGenExtension;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtension;
+import com.yelstream.topp.gradle.plugin.xenomorph.tool.XJCUtility;
 import com.yelstream.topp.gradle.plugin.xenomorph.util.SchemaReference;
 import com.yelstream.topp.gradle.plugin.xenomorph.util.XenomorphPluginUtility;
 import com.yelstream.topp.grind.gradle.api.Projects;
 import com.yelstream.topp.grind.gradle.api.Tasks;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -27,8 +29,11 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskExecutionException;
 
 import javax.inject.Inject;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.nio.file.Files;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -152,67 +157,77 @@ public abstract class XJCTask extends DefaultTask {
 
     public static final Set<String> validTaskPropertyKeys=Set.of("help","version","fullversion");
 
+    @Getter
+    @AllArgsConstructor
+    @Builder(builderClassName="Builder",toBuilder=true)
+    private static class RunContext {
+
+        private final Map<String, Object> projectProperties;
+
+        private final Map<String, Object> taskProperties;
+
+        private final XJCExtension extension;
+
+        private final Integer runIndex;
+
+        private final XJCExtension.Run run;
+    }
+
     @TaskAction
     public void run() throws TaskExecutionException {
         Project project=getProject();
-        Logger logger=project.getLogger();
+        Logger logger=getLogger();
         Tasks.logHello(this);
 
-        File buildDir=project.getBuildDir();
-        Path buildDirectoryPath=project.getBuildDir().toPath();
+        XJCExtension extension=XJCExtension.get(project);
+        if (!extension.isEnable()) {
+            logger.info("Task internals is disabled!");
+        } else {
+            Map<String, Object> projectProperties = Projects.getProjectProperties(project);
+            Map<String, Object> taskProperties = Tasks.getTaskProperties(this);
 
+            try {
+                Tasks.verifyTaskPropertyKeys(this, validTaskPropertyKeys);
 
+                RunContext.Builder builder= RunContext.builder();
+                builder.projectProperties(projectProperties);
+                builder.taskProperties(taskProperties);
+                builder.extension(extension);
+                RunContext runContext=builder.build();
 
-        Map<String,Object> projectProperties=Projects.getProjectProperties(project);
-        Map<String,Object> taskProperties=Tasks.getTaskProperties(this);
+                if (taskProperties.containsKey("help")) {
+                    List<String> args=List.of("-help");
+                    run(args);
+                }
 
-        try {
-            Tasks.verifyTaskPropertyKeys(this,validTaskPropertyKeys);
+                if (taskProperties.containsKey("version")) {
+                    List<String> args=List.of("-version");
+                    run(args);
+                }
 
-            if (taskProperties.containsKey("help")) {
-                List<String> args=List.of("-help");
-                run(args,null);
+                if (taskProperties.containsKey("fullversion")) {
+                    List<String> args=List.of("-fullversion");
+                    run(args);
+                }
+
+                List<XJCExtension.Run> runs=extension.getRuns();
+
+                if (runs == null || runs.isEmpty()) {
+                    logger.warn("Nothing to do! To remove this warning do disable this run.");
+                } else {
+
+                    int runIndex = 0;
+                    for (XJCExtension.Run run : runs) {
+                        runContext=runContext.toBuilder().runIndex(runIndex).run(run).build();
+                        executeRun(runContext);
+                        runIndex++;
+                    }
+                }
+            } catch (Exception ex) {
+                throw new TaskExecutionException(this, ex);
             }
-
-            if (taskProperties.containsKey("version")) {
-                List<String> args=List.of("-version");
-                run(args,null);
-            }
-
-            if (taskProperties.containsKey("fullversion")) {
-                List<String> args=List.of("-fullversion");
-                run(args,null);
-            }
-
-
-            {
-//                File rootDir=project.getRootDir();
-                Path projectDir=project.getProjectDir().toPath();
-                Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
-                Files.createDirectories(generatedFilesDirectory);
-
-//                Path bindingFilesDirectory1=projectDir.resolve(Paths.get("src","main","resources","xjb","mapping.xjb"));
-//                Path bindingFilesDirectory=projectDir.resolve(Paths.get("src","main","resources","xjb"));
-                Path bindingFilesDirectory2=projectDir.resolve(Paths.get("src","main","resources","xjb","Graph-Exchange-XML/1.1/mapping.xjb"));
-                Path bindingFilesDirectory3=projectDir.resolve(Paths.get("src","main","resources","xjb","Graph-Exchange-XML/1.2/mapping.xjb"));
-                Path bindingFilesDirectory4=projectDir.resolve(Paths.get("src","main","resources","xjb","Graph-Exchange-XML/1.3/mapping.xjb"));
-//                Path bindingFilesDirectory5=projectDir.resolve(Paths.get("src","main","resources","xjb","GraphML/mapping.xjb"));
-//                Files.createDirectories(generatedFilesDirectory);
-
-//                Path schemaFile1=projectDir.resolve(Paths.get("src","main","resources","xsd","pain.001.001.02.xsd"));
-                Path schemaFile2=projectDir.resolve(Paths.get("src","main","resources","xsd","Graph-Exchange-XML/1.1/XSD/gexf.xsd"));
-                Path schemaFile3=projectDir.resolve(Paths.get("src","main","resources","xsd","Graph-Exchange-XML/1.2/XSD/gexf.xsd"));
-                Path schemaFile4=projectDir.resolve(Paths.get("src","main","resources","xsd","Graph-Exchange-XML/1.3/XSD/gexf.xsd"));
-                Path schemaFile5=projectDir.resolve(Paths.get("src","main","resources","xsd","GraphML/graphml.xsd"));
-//                Path schemaFile51=projectDir.resolve(Paths.get("src","main","resources","xsd","GraphML/graphml-parseinfo.xsd"));
-//                Path schemaFile52=projectDir.resolve(Paths.get("src","main","resources","xsd","GraphML/graphml-attributes.xsd"));
-//                Files.createDirectories(generatedFilesDirectory);
-
-                Path catalogFile=projectDir.resolve(Paths.get("src","main","resources","cat","catalog.cat"));
-if (!Files.exists(catalogFile)) {
-    throw new IllegalStateException();
-}
-
+        }
+    }
 /*
     Add -Dxml.catalog.verbosity=999 as a command line option to Ant/Maven.
 */
@@ -230,143 +245,104 @@ if (!Files.exists(catalogFile)) {
     NeXML
 */
 
-                List<String> args=
-                    List.of(
-                            "-d",generatedFilesDirectory.toAbsolutePath().toString(),
-                            "-catalog",catalogFile.toAbsolutePath().toString(),
-//                            "-verbose",
+    private void executeRun(RunContext runContext) throws Exception {
+        Project project=getProject();
+        Logger logger=getLogger();
 
-//                            schemaFile1.toAbsolutePath().toString(),
-//                            schemaFile2.toAbsolutePath().toString(),
-                            schemaFile3.toAbsolutePath().toString(),
-//                            schemaFile4.toAbsolutePath().toString(),
-//                            schemaFile5.toAbsolutePath().toString(),
-//                            schemaFile51.toAbsolutePath().toString(),
-//                            schemaFile52.toAbsolutePath().toString(),
+        Integer index=runContext.getRunIndex();
+        String name=runContext.getRun().getName();
+        XJCExtension extension=runContext.getExtension();
+        XJCExtension.Run run=runContext.getRun();
 
-//                            "-b",bindingFilesDirectory1.toAbsolutePath().toString(),
-//                            "-b",bindingFilesDirectory2.toAbsolutePath().toString(),
-                            "-b",bindingFilesDirectory3.toAbsolutePath().toString(),
-//                            "-b",bindingFilesDirectory4.toAbsolutePath().toString(),
-//                            "-b",bindingFilesDirectory5.toAbsolutePath().toString(),
 
-                            "-mark-generated",
-                            "-enableIntrospection"
-                           );
-//                run(args,null);
+        if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(String.format("Executing run; run #%d, name %s, run is %s!",index,name,run));
+            }
+        }
 
-                //project.get
+        if (!run.isEnable()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(String.format("Executing run is disabled; run #%d, name %s, run is %s!",index,name,run));
+            }
+        } else {
+            XJCExtension.Run.Options options = run.getOptions();
+            XJCExtension.Run.Extensions extensions = run.getExtensions();
+
+            File buildDir = project.getBuildDir();
+            Path buildDirectoryPath = project.getBuildDir().toPath();
+            Path projectDir = project.getProjectDir().toPath();
+
+            List<String> args = new ArrayList<>();
+
+            Path generatedFilesDirectory = buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
+
+            args.add("-d");
+            args.add(generatedFilesDirectory.toAbsolutePath().toString());
+
+            if (options.getTargetPackage() != null) {
+                args.add("-p");
+                args.add(options.getTargetPackage());
             }
 
+            if (options.getCatalogFile() != null) {
+                args.add("-catalog");
+/*
+            if (!Files.exists(catalogFile)) {
+                throw new IllegalStateException();
+            }
+*/
+                Path catalogPath = options.getCatalogFile().toPath();
+                args.add(catalogPath.toAbsolutePath().toString());
+            }
 
-            XJCExtension e=XJCExtension.get(project);
-            List<XJCExtension.Run> runs=e.getRuns();
-
-            if (runs==null || runs.isEmpty()) {
-                logger.warn("Nothing to do!");
-            } else {
-                for (XJCExtension.Run run: runs) {
-                    executeRun(run);
+            if (run.getSourceSchema() != null) {
+                List<SchemaReference> schemas = run.getSourceSchema();
+                for (SchemaReference schema : schemas) {
+                    String schemaText = schema.resolve(project);
+                    args.add(schemaText);
+    /*
+                    Path schemaFile=projectDir.resolve(Paths.get(schema));
+                    args.add(schemaFile.toAbsolutePath().toString());
+    */
                 }
             }
 
-//            System.err.println("SchemaGenExtension: "+ SchemaGenExtension.get(project));
+            if (options.getBindingFile() != null) {
+                List<File> bindingFiles = options.getBindingFile();
+                for (File binding : bindingFiles) {
+                    Path bindingPath = binding.toPath();
+                    Path bindingFilesDirectory = projectDir.resolve(bindingPath);
+                    args.add("-b");
+                    args.add(bindingFilesDirectory.toAbsolutePath().toString());
+                }
+            }
 
-        } catch (Exception ex) {
-            throw new TaskExecutionException(this,ex);
-        }
-    }
+            if (extensions.getMarkGenerated() != Boolean.FALSE) {
+                args.add("-mark-generated");
+            }
+            if (options.getEnableIntrospection() != Boolean.FALSE) {
+                args.add("-enableIntrospection");
+            }
 
-    private void executeRun(XJCExtension.Run run) throws Exception {
-        Project project=getProject();
-        Logger logger=project.getLogger();
+            if (logger.isInfoEnabled()) {
+                 logger.info(String.format("Run has arguments; the arguments to 'xjc' are '%s'!",args));
+            }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("Run is named %s!",run.getName()),run);
-        }
-
-        XJCExtension.Run.Options options=run.getOptions();
-        XJCExtension.Run.Extensions extensions=run.getExtensions();
-
-        File buildDir=project.getBuildDir();
-        Path buildDirectoryPath=project.getBuildDir().toPath();
-        Path projectDir=project.getProjectDir().toPath();
-
-        List<String> args=new ArrayList<>();
-
-        Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
-
-        args.add("-d");
-        args.add(generatedFilesDirectory.toAbsolutePath().toString());
-
-        if (options.getTargetPackage()!=null) {
-            args.add("-p");
-            args.add(options.getTargetPackage());
-        }
-
-        if (options.getCatalogFile()!=null) {
-            args.add("-catalog");
-            Path catalogPath=options.getCatalogFile().toPath();
-            args.add(catalogPath.toAbsolutePath().toString());
-        }
-
-        if (run.getSourceSchema()!=null) {
-            List<SchemaReference> schemas=run.getSourceSchema();
-            for (SchemaReference schema: schemas) {
-                String schemaText=schema.resolve(project);
-                args.add(schemaText);
-/*
-                Path schemaFile=projectDir.resolve(Paths.get(schema));
-                args.add(schemaFile.toAbsolutePath().toString());
-*/
+            if (extension.isDry()) {
+                logger.warn("Executing run is a dry run; task is marked a dry run!");
+            } else {
+                if (run.isDry()) {
+                    logger.warn("Executing run is a dry run; run is marked a dry run!");
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(String.format("Executing run; run #%d, name %s, run is %s, arguments to 'xjc' are '%s'!", index, name, run, args));
+                    }
+                    run(args);
+                }
             }
         }
-
-        if (options.getBindingFile()!=null) {
-            List<File> bindingFiles=options.getBindingFile();
-            for (File binding: bindingFiles) {
-                Path bindingPath=binding.toPath();
-                Path bindingFilesDirectory=projectDir.resolve(bindingPath);
-                args.add("-b");
-                args.add(bindingFilesDirectory.toAbsolutePath().toString());
-            }
-        }
-
-        if (extensions.getMarkGenerated()!=Boolean.FALSE) {
-            args.add("-mark-generated");
-        }
-        if (options.getEnableIntrospection()!=Boolean.FALSE) {
-            args.add("-enableIntrospection");
-        }
-
-System.err.println("Run: "+args);
-        run(args,null);
-        if (run.getEnable()!=Boolean.FALSE) {
-            run(args);
-        }
     }
-
-    private void run(List<String> args) throws Exception {
-        IntConsumer statusConsumer= status -> {
-            if (status!=0) {
-                throw new IllegalStateException(String.format("Failure to show full version; return status from XJC is %d!",status));
-            }
-        };
-        run(args,statusConsumer);
-    }
-
-    private void run(List<String> args,
-                     IntConsumer statusConsumer) throws Exception {
-        int status=Driver.run(args.toArray(new String[0]),System.out,System.err);
-        if (statusConsumer!=null) {
-            statusConsumer.accept(status);
-        }
-    }
-
-
-
-//     ./bin/xjc.bat -b mapping.xjb -mark-generated -enableIntrospection pain.001.001.02.xsd
-
 
     /*
 JAXBContext jaxbContext = JAXBContext.newInstance(packageName);
@@ -374,4 +350,44 @@ Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 Graphml graphml= (Graphml) jaxbUnmarshaller.unmarshal(xmlFile);
      */
 
+    public void run(List<String> args) throws Exception {
+        run(args,null);
+    }
+
+    public void run(List<String> args,
+                    IntConsumer statusConsumer) throws Exception {
+        Logger logger=getLogger();
+        String outText=process(out->{
+            String errText=process(err->{
+                XJCUtility.CommandContext commandContext=
+                    XJCUtility.CommandContext.builder().out(out).err(err).statusConsumer(statusConsumer).build();
+                XJCUtility.run(commandContext,args);
+            });
+            if (errText!=null && !errText.isEmpty()) {
+                if (logger.isErrorEnabled()) {
+                    logger.error(String.format("Failure to run'; error is:%n%s", errText));
+                }
+            }
+        });
+        if (outText!=null && !outText.isEmpty()) {
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("Informational is:%n%s", outText));
+            }
+        }
+    }
+
+    @FunctionalInterface
+    interface ConsumerWithException<V,E extends Exception> {
+        void accept(V v) throws E;
+    }
+
+    public static <E extends Exception> String process(ConsumerWithException<PrintStream,E> consumer) throws E, IOException {
+        try (ByteArrayOutputStream outStream=new ByteArrayOutputStream()) {
+            try (PrintStream out=new PrintStream(outStream)) {
+                consumer.accept(out);
+                out.flush();
+                return outStream.toString(Charset.defaultCharset());
+            }
+        }
+    }
 }
