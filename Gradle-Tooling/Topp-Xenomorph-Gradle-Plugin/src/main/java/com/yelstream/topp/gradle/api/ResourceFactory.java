@@ -5,10 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.PathValidation;
 import org.gradle.api.Project;
+import org.gradle.api.plugins.JavaPlugin;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -37,8 +40,8 @@ public class ResourceFactory {
     }
 
     /**
-     * Resolves a file path relative to the project directory of this project.
-     * @param reference The object to resolve as a File.
+     * Resolves a file path relative to the resource directory.
+     * @param reference The object to resolve as a file.
      * @return Resolved file.
      *         This is never {@code null}.
      */
@@ -47,52 +50,17 @@ public class ResourceFactory {
         if (reference==null) {
             throw new IllegalArgumentException("Failure to resolve path reference; reference is not set!");
         }
-/*
-        switch (reference) {
-            case String name -> {
-                File file=new File(getResourceDir(),name);
-                resolved=file.getAbsoluteFile();
-            }
-            case File file -> {
-                if (file.isAbsolute()) {
-                    resolved=file;
-                } else {
-                    resolved=new File(getResourceDir(),file.getName());
-                }
-            }
-            case Path path -> {
-                if (path.isAbsolute()) {
-                    resolved=path.toFile();
-                } else {
-                    Path projectDir=getResourceDir().toPath();
-                    resolved=projectDir.resolve(path).toFile();
-                }
-            }
-            default -> {
-                throw new IllegalArgumentException(String.format("Failure to resolve path reference; cannot recognize path reference type %s!",reference.getClass().getName()));
-            }
-        }
- */
         if (reference instanceof String name) {
-            File file=new File(getResourceDir(),name);
-                resolved=file.getAbsoluteFile();
+            File file=new File(name);
+            resolved=resolve(file);
         } else {
             if (reference instanceof File file) {
-                if (file.isAbsolute()) {
-                    resolved=file;
-                } else {
-                    resolved=new File(getResourceDir(),file.getName());
-                }
+                resolved=resolve(file);
             } else {
                 if (reference instanceof Path path) {
-                    if (path.isAbsolute()) {
-                        resolved=path.toFile();
-                    } else {
-                        Path projectDir=getResourceDir().toPath();
-                        resolved=projectDir.resolve(path).toFile();
-                    }
+                    resolved=resolve(path).toFile();
                 } else {
-                    throw new IllegalArgumentException(String.format("Failure to resolve path reference; cannot recognize path reference type %s!", reference.getClass().getName()));
+                    throw new IllegalArgumentException(String.format("Failure to resolve path reference; cannot recognize path reference type %s!",reference.getClass().getName()));
                 }
             }
         }
@@ -100,7 +68,7 @@ public class ResourceFactory {
     }
 
     /**
-     * Resolves a file path relative to the project directory of this project.
+     * Resolves a file path relative to the resource directory.
      * @param reference The object to resolve as a file.
      * @param validation Path validation rule.
      * @return Resolved file.
@@ -113,25 +81,97 @@ public class ResourceFactory {
             switch (validation) {
                 case NONE: {
                     if (file.exists()) {
-                        throw new InvalidUserDataException(String.format("Failure to resolve path reference; path resolved as %s, but path must not exist!",file));
+                        throw new InvalidUserDataException(String.format("Failure to resolve file reference; path resolved as %s, but path must not exist!",file));
                     }
                     break;
                 }
                 case EXISTS: {
                     if (!file.exists()) {
-                        throw new InvalidUserDataException(String.format("Failure to resolve path reference; path resolved as %s, but path must exist!",file));
+                        throw new InvalidUserDataException(String.format("Failure to resolve file reference; path resolved as %s, but path must exist!",file));
                     }
                     break;
                 }
                 case FILE: {
                     if (!file.isFile()) {
-                        throw new InvalidUserDataException(String.format("Failure to resolve path reference; path resolved as %s, but path must be an existing file!",file));
+                        throw new InvalidUserDataException(String.format("Failure to resolve file reference; path resolved as %s, but path must be an existing file!",file));
                     }
                     break;
                 }
                 case DIRECTORY: {
                     if (!file.isDirectory()) {
-                        throw new InvalidUserDataException(String.format("Failure to resolve path reference; path resolved as %s, but path must be an existing directory!",file));
+                        throw new InvalidUserDataException(String.format("Failure to resolve file reference; path resolved as %s, but path must be an existing directory!",file));
+                    }
+                    break;
+                }
+                default: {
+                    throw new IllegalArgumentException(String.format("Failure to resolve file reference; cannot recognize validation value %s!",validation));
+                }
+            }
+        }
+        return file;
+    }
+
+    /**
+     * Resolves a file path relative to the resource directory.
+     * @param reference The object to resolve as a file.
+     * @return Resolved file.
+     *         This is never {@code null}.
+     */
+    public Path path(Object reference) {
+        Path resolved;
+        if (reference==null) {
+            throw new IllegalArgumentException("Failure to resolve path reference; reference is not set!");
+        }
+        if (reference instanceof String name) {
+            Path path=getResourceDir().toPath().resolve(name);
+            resolved=path.toAbsolutePath();
+        } else {
+            if (reference instanceof File file) {
+                resolved=resolve(file).toPath();
+            } else {
+                if (reference instanceof Path path) {
+                    resolved=resolve(path);
+                } else {
+                    throw new IllegalArgumentException(String.format("Failure to resolve path reference; cannot recognize path reference type %s!",reference.getClass().getName()));
+                }
+            }
+        }
+        return resolved;
+    }
+
+    /**
+     * Resolves a file path relative to the resource directory.
+     * @param reference The object to resolve as a file.
+     * @param validation Path validation rule.
+     * @return Resolved file.
+     *         This is never {@code null}.
+     * @throws InvalidUserDataException Thrown in case of invalid user data.
+     */
+    public Path path(Object reference, PathValidation validation) throws InvalidUserDataException {
+        Path path=path(reference);
+        if (validation!=null) {
+            switch (validation) {
+                case NONE: {
+                    if (Files.exists(path)) {
+                        throw new InvalidUserDataException(String.format("Failure to resolve path reference; path resolved as %s, but path must not exist!",path));
+                    }
+                    break;
+                }
+                case EXISTS: {
+                    if (!Files.exists(path)) {
+                        throw new InvalidUserDataException(String.format("Failure to resolve path reference; path resolved as %s, but path must exist!",path));
+                    }
+                    break;
+                }
+                case FILE: {
+                    if (!Files.isRegularFile(path)) {
+                        throw new InvalidUserDataException(String.format("Failure to resolve path reference; path resolved as %s, but path must be an existing file!",path));
+                    }
+                    break;
+                }
+                case DIRECTORY: {
+                    if (!Files.isDirectory(path)) {
+                        throw new InvalidUserDataException(String.format("Failure to resolve path reference; path resolved as %s, but path must be an existing directory!",path));
                     }
                     break;
                 }
@@ -140,22 +180,92 @@ public class ResourceFactory {
                 }
             }
         }
-        return file;
+        return path;
     }
 
-    public Path path(Object reference) {
-        return null;
+    /**
+     * Resolves a reference relative to the resource directory as a URI.
+     * @param reference The object to resolve as a file.
+     * @return Resolved reference as a URI.
+     *         This is never {@code null}.
+     */
+    public URI uri(Object reference) {
+        URI resolved;
+        if (reference==null) {
+            throw new IllegalArgumentException("Failure to resolve URI; name is not set!");
+        }
+        if (reference instanceof String name) {
+            resolved=URI.create(name);
+        } else {
+            if (reference instanceof File file) {
+                resolved=resolve(file).toURI();
+            } else {
+                if (reference instanceof Path path) {
+                    resolved=resolve(path).toUri();
+                } else {
+                    throw new IllegalArgumentException(String.format("Failure to resolve URI reference; cannot recognize path reference type %s!", reference.getClass().getName()));
+                }
+            }
+        }
+        return resolved;
     }
 
-    public Path path(Object reference, PathValidation validation) throws InvalidUserDataException {
-        return null;
+    /**
+     * Resolves a reference relative to the resource directory as a URL.
+     * @param reference The object to resolve as a file.
+     * @return Resolved reference as a URL.
+     *         This is never {@code null}.
+     * @throws MalformedURLException Thrown in case of URL being malformed.
+     */
+    public URL url(Object reference) throws MalformedURLException {
+        URL resolved;
+        if (reference==null) {
+            throw new IllegalArgumentException("Failure to resolve URI; name is not set!");
+        }
+        if (reference instanceof String name) {
+            resolved=new URL(name);
+        } else {
+            if (reference instanceof File file) {
+                resolved=resolve(file).toPath().toUri().toURL();
+            } else {
+                if (reference instanceof Path path) {
+                    resolved=resolve(path).toUri().toURL();
+                } else {
+                    throw new IllegalArgumentException(String.format("Failure to resolve URL reference; cannot recognize path reference type %s!", reference.getClass().getName()));
+                }
+            }
+        }
+        return resolved;
     }
 
-    public URI uri(Object name) {
-        return null;
+    /**
+     * Resolves a file relative to the resource directory.
+     * @param file File to resolve.
+     * @return Resolved file.
+     */
+    public File resolve(File file) {
+        File resolved;
+        if (file.isAbsolute()) {
+            resolved=file;
+        } else {
+            resolved=new File(getResourceDir(),file.getName());
+        }
+        return resolved;
     }
 
-    public URL url(Object name) {
-        return null;
+    /**
+     * Resolves a path relative to the resource directory.
+     * @param path Path to resolve.
+     * @return Resolved path.
+     */
+    public Path resolve(Path path) {
+        Path resolved;
+        if (path.isAbsolute()) {
+            resolved=path;
+        } else {
+            Path projectDir=getResourceDir().toPath();
+            resolved=projectDir.resolve(path);
+        }
+        return resolved;
     }
 }

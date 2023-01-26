@@ -155,7 +155,7 @@ public abstract class XJCTask extends DefaultTask {
         });
     }
 
-    public static final Set<String> validTaskPropertyKeys=Set.of("help","version","fullversion");
+    public static final Set<String> validTaskPropertyKeys=Set.of("help","version","fullversion","dry");
 
     @Getter
     @AllArgsConstructor
@@ -179,41 +179,41 @@ public abstract class XJCTask extends DefaultTask {
         Logger logger=getLogger();
         Tasks.logHello(this);
 
-        XJCExtension extension=XJCExtension.get(project);
-        if (!extension.isEnable()) {
-            logger.info("Task internals is disabled!");
-        } else {
-            Map<String, Object> projectProperties = Projects.getProjectProperties(project);
-            Map<String, Object> taskProperties = Tasks.getTaskProperties(this);
+        Map<String, Object> projectProperties = Projects.getProjectProperties(project);
+        Map<String, Object> taskProperties = Tasks.getTaskProperties(this);
 
-            try {
-                Tasks.verifyTaskPropertyKeys(this, validTaskPropertyKeys);
+        try {
+            Tasks.verifyTaskPropertyKeys(this, validTaskPropertyKeys);
 
+            if (taskProperties.containsKey("help")) {
+                List<String> args=List.of("-help");
+                run(args);
+            }
+
+            if (taskProperties.containsKey("version")) {
+                List<String> args=List.of("-version");
+                run(args);
+            }
+
+            if (taskProperties.containsKey("fullversion")) {
+                List<String> args=List.of("-fullversion");
+                run(args);
+            }
+
+            XJCExtension extension=XJCExtension.get(project);
+            if (!extension.isEnable()) {
+                logger.info("Task internals is disabled!");
+            } else {
                 RunContext.Builder builder= RunContext.builder();
                 builder.projectProperties(projectProperties);
                 builder.taskProperties(taskProperties);
                 builder.extension(extension);
                 RunContext runContext=builder.build();
 
-                if (taskProperties.containsKey("help")) {
-                    List<String> args=List.of("-help");
-                    run(args);
-                }
-
-                if (taskProperties.containsKey("version")) {
-                    List<String> args=List.of("-version");
-                    run(args);
-                }
-
-                if (taskProperties.containsKey("fullversion")) {
-                    List<String> args=List.of("-fullversion");
-                    run(args);
-                }
-
                 List<XJCExtension.Run> runs=extension.getRuns();
 
                 if (runs == null || runs.isEmpty()) {
-                    logger.warn("Nothing to do! To remove this warning do disable this run.");
+                    logger.warn("Nothing to do! To remove this warning, do disable this run.");
                 } else {
 
                     int runIndex = 0;
@@ -223,14 +223,11 @@ public abstract class XJCTask extends DefaultTask {
                         runIndex++;
                     }
                 }
-            } catch (Exception ex) {
-                throw new TaskExecutionException(this, ex);
             }
+        } catch (Exception ex) {
+            throw new TaskExecutionException(this,ex);
         }
     }
-/*
-    Add -Dxml.catalog.verbosity=999 as a command line option to Ant/Maven.
-*/
 /*
     -Djavax.xml.accessExternalSchema=all
     -Djavax.xml.accessExternalSchema=file,http
@@ -254,7 +251,6 @@ public abstract class XJCTask extends DefaultTask {
         XJCExtension extension=runContext.getExtension();
         XJCExtension.Run run=runContext.getRun();
 
-
         if (logger.isDebugEnabled()) {
             if (logger.isDebugEnabled()) {
                 logger.debug(String.format("Executing run; run #%d, name %s, run is %s!",index,name,run));
@@ -266,40 +262,168 @@ public abstract class XJCTask extends DefaultTask {
                 logger.debug(String.format("Executing run is disabled; run #%d, name %s, run is %s!",index,name,run));
             }
         } else {
-            XJCExtension.Run.Options options = run.getOptions();
-            XJCExtension.Run.Extensions extensions = run.getExtensions();
+            XJCExtension.Run.Options options=run.getOptions();
+            XJCExtension.Run.Extensions extensions=run.getExtensions();
 
-            File buildDir = project.getBuildDir();
-            Path buildDirectoryPath = project.getBuildDir().toPath();
-            Path projectDir = project.getProjectDir().toPath();
+            File buildDir=project.getBuildDir();
+            Path buildDirectoryPath=project.getBuildDir().toPath();
+            Path projectDir=project.getProjectDir().toPath();
 
-            List<String> args = new ArrayList<>();
+            List<String> args=new ArrayList<>();
 
-            Path generatedFilesDirectory = buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
-
-            args.add("-d");
-            args.add(generatedFilesDirectory.toAbsolutePath().toString());
-
-            if (options.getTargetPackage() != null) {
-                args.add("-p");
-                args.add(options.getTargetPackage());
+            if (options.isNv()) {
+                args.add("-nv");
             }
 
-            if (options.getCatalogFile() != null) {
-                args.add("-catalog");
+            if (options.isExtension()) {
+                args.add("-extension");
+            }
+
+            {  //TODO: DO SOMETHING ELSE IF DIR IS DECLARED!
+                Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
+                args.add("-d");
+                args.add(generatedFilesDirectory.toAbsolutePath().toString());
+            }
+
+            {
+                String targetPackage=options.getTargetPackage();
+                if (targetPackage!=null) {
+                    args.add("-p");
+                    args.add(targetPackage);
+                }
+            }
+
+            {
+                String moduleName=options.getModuleName();
+                if (moduleName!=null) {
+                    args.add("-m");
+                    args.add(moduleName);
+                }
+            }
+
+            {
+                String httpProxy=options.getHttpProxy();
+                if (httpProxy!=null) {
+                    args.add("-httpproxy");
+                    args.add(httpProxy);
+                }
+            }
+
+            {
+                File httpProxyFile=options.getHttpProxyFile();
+                if (httpProxyFile!=null) {
+                    args.add("-httpproxyfile");
+                    args.add(httpProxyFile.getAbsolutePath());  //TODO: Ensure file is resolved properly!
+                }
+            }
+
+            {
+                File httpProxyFile=options.getHttpProxyFile();
+                if (httpProxyFile!=null) {
+                    args.add("-httpproxyfile");
+                    args.add(httpProxyFile.getAbsolutePath());  //TODO: Ensure file is resolved properly!
+                }
+            }
+
+            {
+                String classpath=options.getClasspath();
+                if (classpath!=null) {
+                    args.add("-classpath");
+                    args.add(classpath);
+                }
+            }
+
+            {
+                File catalogFile=options.getCatalogFile();
+                if (catalogFile!=null) {
+                    args.add("-catalog");
 /*
             if (!Files.exists(catalogFile)) {
                 throw new IllegalStateException();
             }
 */
-                Path catalogPath = options.getCatalogFile().toPath();
-                args.add(catalogPath.toAbsolutePath().toString());
+                    args.add(catalogFile.getAbsolutePath());  //TODO: Ensure file is resolved properly!
+                }
+
+                logger.info("Catalog files may be tracked by using '-Dxml.catalog.verbosity=999'.");
             }
 
-            if (run.getSourceSchema() != null) {
-                List<SchemaReference> schemas = run.getSourceSchema();
-                for (SchemaReference schema : schemas) {
-                    String schemaText = schema.resolve(project);
+            if (options.isReadOnly()) {
+                args.add("-readOnly");
+            }
+
+            if (options.isNpa()) {
+                args.add("-npa");
+            }
+
+            if (options.isNoHeader()) {
+                args.add("-no-header");
+            }
+
+            {
+                String target=options.getTarget();
+                if (target!=null) {
+                    args.add("-target");
+                    args.add(target);
+                }
+            }
+
+            {
+                String encoding=options.getEncoding();  //TODO: Consider default!
+                if (encoding!=null) {
+                    args.add("-encoding");
+                    args.add(encoding);
+                }
+            }
+
+            if (options.isEnableIntrospection()) {
+                args.add("-enableIntrospection");
+            }
+
+            if (options.isDisableXmlSecurity()) {
+                args.add("-disableXmlSecurity");
+            }
+
+            if (options.isContentForWildcard()) {
+                args.add("-contentForWildcard");
+            }
+
+            if (options.isXmlschema()) {
+                args.add("-xmlschema");
+            }
+
+            if (options.isDtd()) {
+                args.add("-dtd");
+            }
+
+            if (options.isWsdl()) {
+                args.add("-wsdl");
+            }
+
+            if (options.isVerbose()) {
+                args.add("-verbose");
+            }
+
+            if (options.isQuiet()) {
+                args.add("-quiet");
+            }
+
+            if (options.isHelp()) {
+                args.add("-help");
+            }
+
+            if (options.isVersion()) {
+                args.add("-version");
+            }
+
+            if (options.isFullversion()) {
+                args.add("-fullversion");
+            }
+
+            if (run.getSourceSchema()!=null) {
+                List<SchemaReference> schemas=run.getSourceSchema();
+                for (SchemaReference schema: schemas) {
+                    String schemaText=schema.resolve(project);
                     args.add(schemaText);
     /*
                     Path schemaFile=projectDir.resolve(Paths.get(schema));
@@ -308,37 +432,74 @@ public abstract class XJCTask extends DefaultTask {
                 }
             }
 
-            if (options.getBindingFile() != null) {
-                List<File> bindingFiles = options.getBindingFile();
-                for (File binding : bindingFiles) {
-                    Path bindingPath = binding.toPath();
-                    Path bindingFilesDirectory = projectDir.resolve(bindingPath);
+            if (options.getBindingFile()!=null) {
+                List<File> bindingFiles=options.getBindingFile();
+                for (File binding: bindingFiles) {
+                    Path bindingPath=binding.toPath();
+                    Path bindingFilesDirectory=projectDir.resolve(bindingPath);
                     args.add("-b");
                     args.add(bindingFilesDirectory.toAbsolutePath().toString());
                 }
             }
 
-            if (extensions.getMarkGenerated() != Boolean.FALSE) {
+            if (extensions.isXInjectCode()) {
+                args.add("-Xinject-code");
+            }
+
+            if (extensions.isXLocator()) {
+                args.add("-Xlocator");
+            }
+
+            if (extensions.isXSyncMethods()) {
+                args.add("-Xsync-methods");
+            }
+
+            if (extensions.isMarkGenerated()) {
                 args.add("-mark-generated");
             }
-            if (options.getEnableIntrospection() != Boolean.FALSE) {
-                args.add("-enableIntrospection");
+
+            if (extensions.isNoDate()) {
+                args.add("-noDate");
+            }
+
+            {
+                String annotation=extensions.getXAnn();
+                if (annotation!=null) {
+                    args.add("-Xann");
+                    args.add(annotation);
+                }
+            }
+
+            {
+                File episode=extensions.getEpisode();
+                if (episode!=null) {
+                    args.add("-episode");
+                    args.add(episode.getAbsolutePath());  //TODO: Ensure file is resolved properly!
+                }
+            }
+
+            if (extensions.isXPropertyAccessors()) {
+                args.add("-Xpropertyaccessors");
             }
 
             if (logger.isInfoEnabled()) {
                  logger.info(String.format("Run has arguments; the arguments to 'xjc' are '%s'!",args));
             }
 
-            if (extension.isDry()) {
-                logger.warn("Executing run is a dry run; task is marked a dry run!");
+            if (runContext.getTaskProperties().containsKey("dry")) {
+                logger.warn("Run is dry; task property indicates a dry run!");
             } else {
-                if (run.isDry()) {
-                    logger.warn("Executing run is a dry run; run is marked a dry run!");
+                if (extension.isDry()) {
+                    logger.warn("Run is dry; task is marked a dry run!");
                 } else {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(String.format("Executing run; run #%d, name %s, run is %s, arguments to 'xjc' are '%s'!", index, name, run, args));
+                    if (run.isDry()) {
+                        logger.warn("Run is dry; run is marked a dry run!");
+                    } else {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(String.format("Executing run; run #%d, name %s, run is %s, arguments to 'xjc' are '%s'!",index,name,run,args));
+                        }
+                        run(args);
                     }
-                    run(args);
                 }
             }
         }

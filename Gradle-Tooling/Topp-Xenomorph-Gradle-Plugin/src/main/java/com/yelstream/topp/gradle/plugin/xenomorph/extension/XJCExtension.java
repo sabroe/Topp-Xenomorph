@@ -66,9 +66,37 @@ public class XJCExtension {
             private File outputDirectory;
             private String targetPackage;
 
+            private String moduleName;
+
+            private String httpProxy;
+
+            private File httpProxyFile;
+
+            private String classpath;  //TODO: Consider this!
+
             private File catalogFile;
 
-            private Boolean enableIntrospection;
+            private boolean readOnly;
+
+            private boolean npa;
+
+            private boolean noHeader;
+
+            private String target;
+
+            private String encoding;  //TODO: Consider default!
+
+            private boolean enableIntrospection;
+
+            private boolean disableXmlSecurity;
+
+            private boolean contentForWildcard;
+
+            private boolean xmlschema;
+
+            private boolean dtd;
+
+            private boolean wsdl;
 
             private boolean verbose;
             private boolean quiet;
@@ -80,14 +108,14 @@ public class XJCExtension {
         @Data
         @NoArgsConstructor
         public static class Extensions {
-            private Boolean xInjectCode;
-            private Boolean xLocator;
-            private Boolean xSyncMethods;
-            private Boolean markGenerated;
-            private Boolean noDate;
+            private boolean xInjectCode;
+            private boolean xLocator;
+            private boolean xSyncMethods;
+            private boolean markGenerated;
+            private boolean noDate;
             private String xAnn;
             private File episode;
-            private Boolean xPropertyAccessors;
+            private boolean xPropertyAccessors;
         }
 
         private Options options;
