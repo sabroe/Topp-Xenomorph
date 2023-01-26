@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.PathValidation;
 import org.gradle.api.Project;
-import org.gradle.api.plugins.JavaPlugin;
 
 import java.io.File;
 import java.net.MalformedURLException;
