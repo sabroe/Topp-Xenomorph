@@ -1,5 +1,6 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
+import com.yelstream.topp.command.Status;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtension;
 import com.yelstream.topp.gradle.plugin.xenomorph.tool.XJCUtility;
@@ -10,6 +11,7 @@ import com.yelstream.topp.grind.gradle.api.Tasks;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -21,26 +23,24 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.Classpath;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskExecutionException;
+import org.gradle.api.tasks.options.Option;
 
 import javax.inject.Inject;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
 /**
@@ -127,6 +127,31 @@ public abstract class XJCTask extends DefaultTask {
 
     private ResourceLoaderContainer resourceLoaderContainer;
 
+    @Optional
+    @Getter(onMethod_={@Input})
+    @Setter(onMethod_={@Option(option="help",description="Shows some initial help for how use this task.")})
+    private Boolean optionHelp;
+
+    @Optional
+    @Getter(onMethod_={@Input})
+    @Setter(onMethod_={@Option(option="native-help",description="Shows the help as output from native JAXB XJC.")})
+    private Boolean optionNativeHelp;
+
+    @Optional
+    @Getter(onMethod_={@Input})
+    @Setter(onMethod_={@Option(option="native-version",description="Shows the version as output from native JAXB XJC.")})
+    private Boolean optionNativeVersion;
+
+    @Optional
+    @Getter(onMethod_={@Input})
+    @Setter(onMethod_={@Option(option="native-full-version",description="Shows the full version as output from native JAXB XJC.")})
+    private Boolean optionNativeFullVersion;
+
+    @Optional
+    @Getter(onMethod_={@Input})
+    @Setter(onMethod_={@Option(option="dry",description="Configures task invocation to process arguments without actually running.")})
+    private Boolean optionDry;
+
     @Inject
     public XJCTask(Supplier<PluginContext> pluginContextSupplier) {
         this.pluginContextSupplier=pluginContextSupplier;
@@ -155,7 +180,7 @@ public abstract class XJCTask extends DefaultTask {
         });
     }
 
-    public static final Set<String> validTaskPropertyKeys=Set.of("help","version","fullversion","dry");
+    public static final Set<String> validTaskPropertyKeys=Set.of("native-help","native-version","native-fullversion","dry","help");
 
     @Getter
     @AllArgsConstructor
@@ -185,19 +210,24 @@ public abstract class XJCTask extends DefaultTask {
         try {
             Tasks.verifyTaskPropertyKeys(this, validTaskPropertyKeys);
 
-            if (taskProperties.containsKey("help")) {
-                List<String> args=List.of("-help");
-                run(args);
-            }
-
-            if (taskProperties.containsKey("version")) {
+            if (optionNativeVersion==Boolean.TRUE || taskProperties.containsKey("native-version")) {
                 List<String> args=List.of("-version");
-                run(args);
+                XJCUtility.executeCommandToConsole(args,Status.EMPTY_STATUS_VERIFIER);
             }
 
-            if (taskProperties.containsKey("fullversion")) {
+            if (optionNativeFullVersion==Boolean.TRUE || taskProperties.containsKey("native-fullversion")) {
                 List<String> args=List.of("-fullversion");
-                run(args);
+                XJCUtility.executeCommandToConsole(args,Status.EMPTY_STATUS_VERIFIER);
+            }
+
+            if (optionNativeHelp==Boolean.TRUE || taskProperties.containsKey("native-help")) {
+                List<String> args=List.of("-help");
+                XJCUtility.executeCommandToConsole(args,Status.EMPTY_STATUS_VERIFIER);
+            }
+
+            if (optionHelp==Boolean.TRUE || taskProperties.containsKey("help")) {
+                List<String> args=List.of("-help");
+                XJCUtility.executeCommandToConsole(args,Status.EMPTY_STATUS_VERIFIER);
             }
 
             XJCExtension extension=XJCExtension.get(project);
@@ -486,7 +516,7 @@ public abstract class XJCTask extends DefaultTask {
                  logger.info(String.format("Run has arguments; the arguments to 'xjc' are '%s'!",args));
             }
 
-            if (runContext.getTaskProperties().containsKey("dry")) {
+            if (optionDry==Boolean.TRUE || runContext.getTaskProperties().containsKey("dry")) {
                 logger.warn("Run is dry; task property indicates a dry run!");
             } else {
                 if (extension.isDry()) {
@@ -498,7 +528,7 @@ public abstract class XJCTask extends DefaultTask {
                         if (logger.isDebugEnabled()) {
                             logger.debug(String.format("Executing run; run #%d, name %s, run is %s, arguments to 'xjc' are '%s'!",index,name,run,args));
                         }
-                        run(args);
+                        XJCUtility.executeCommandToLogger(args,null,getLogger());
                     }
                 }
             }
@@ -511,44 +541,4 @@ Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 Graphml graphml= (Graphml) jaxbUnmarshaller.unmarshal(xmlFile);
      */
 
-    public void run(List<String> args) throws Exception {
-        run(args,null);
-    }
-
-    public void run(List<String> args,
-                    IntConsumer statusConsumer) throws Exception {
-        Logger logger=getLogger();
-        String outText=process(out->{
-            String errText=process(err->{
-                XJCUtility.CommandContext commandContext=
-                    XJCUtility.CommandContext.builder().out(out).err(err).statusConsumer(statusConsumer).build();
-                XJCUtility.run(commandContext,args);
-            });
-            if (errText!=null && !errText.isEmpty()) {
-                if (logger.isErrorEnabled()) {
-                    logger.error(String.format("Failure to run'; error is:%n%s", errText));
-                }
-            }
-        });
-        if (outText!=null && !outText.isEmpty()) {
-            if (logger.isInfoEnabled()) {
-                logger.info(String.format("Informational is:%n%s", outText));
-            }
-        }
-    }
-
-    @FunctionalInterface
-    interface ConsumerWithException<V,E extends Exception> {
-        void accept(V v) throws E;
-    }
-
-    public static <E extends Exception> String process(ConsumerWithException<PrintStream,E> consumer) throws E, IOException {
-        try (ByteArrayOutputStream outStream=new ByteArrayOutputStream()) {
-            try (PrintStream out=new PrintStream(outStream)) {
-                consumer.accept(out);
-                out.flush();
-                return outStream.toString(Charset.defaultCharset());
-            }
-        }
-    }
 }

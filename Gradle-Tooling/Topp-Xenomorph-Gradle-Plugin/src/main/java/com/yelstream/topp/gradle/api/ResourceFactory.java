@@ -247,7 +247,7 @@ public class ResourceFactory {
         if (file.isAbsolute()) {
             resolved=file;
         } else {
-            resolved=new File(getResourceDir(),file.getName());
+            resolved=new File(getResourceDir(),file.getPath());
         }
         return resolved;
     }
