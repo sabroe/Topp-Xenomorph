@@ -70,10 +70,5 @@ dependencies {
 
     //See https://eclipse-ee4j.github.io/jaxb-ri/ !
     api 'jakarta.annotation:jakarta.annotation-api:2.1.1'  //Necessary for e.g. @Generated as 'jakarta.annotation.Generated'!
-//    api 'jakarta.activation:jakarta.activation-api:2.1.0'
-//    api 'org.eclipse.angus:angus-activation:1.0.0'
     api 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
-//    api 'com.sun.xml.bind:jaxb-core:4.0.1'
-//    api 'com.sun.xml.bind:jaxb-impl:4.0.1'
-//    api 'com.sun.xml.bind:jaxb-jxc:4.0.1'
 }

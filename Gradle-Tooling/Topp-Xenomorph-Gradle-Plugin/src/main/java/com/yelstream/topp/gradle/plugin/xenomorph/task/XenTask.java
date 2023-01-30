@@ -1,6 +1,5 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
-import com.sun.tools.xjc.Driver;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
 import com.yelstream.topp.grind.gradle.api.Projects;
 import com.yelstream.topp.grind.gradle.api.Tasks;
@@ -14,10 +13,8 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskExecutionException;
 
 import javax.inject.Inject;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
 /**
@@ -120,6 +117,7 @@ public abstract class XenTask extends DefaultTask {
         try {
             Tasks.verifyTaskPropertyKeys(this,validTaskPropertyKeys);
 
+/*
             if (taskProperties.containsKey("help")) {
                 List<String> args=List.of("-help");
                 run(args,null);
@@ -134,11 +132,13 @@ public abstract class XenTask extends DefaultTask {
                 List<String> args=List.of("-fullversion");
                 run(args,null);
             }
+*/
         } catch (Exception ex) {
             throw new TaskExecutionException(this,ex);
         }
     }
 
+/*
     private void run(List<String> args) throws Exception {
         IntConsumer statusConsumer= status -> {
             if (status!=0) {
@@ -155,4 +155,5 @@ public abstract class XenTask extends DefaultTask {
             statusConsumer.accept(status);
         }
     }
+*/
 }

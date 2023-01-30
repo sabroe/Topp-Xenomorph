@@ -142,7 +142,6 @@ public class CommandInitiator {
         return builder.build();
     }
 
-
     /**
      * Creates a command-initiator using a {@link PrintStream}-based driver as its offset.
      * @param argument Command arguments.

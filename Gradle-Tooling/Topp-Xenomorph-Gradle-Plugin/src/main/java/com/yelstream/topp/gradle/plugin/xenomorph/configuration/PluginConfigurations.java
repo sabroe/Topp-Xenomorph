@@ -9,6 +9,8 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 
+import java.util.List;
+
 /**
  * Plugin configurations.
  *
@@ -20,23 +22,74 @@ import org.gradle.api.artifacts.ConfigurationContainer;
 @AllArgsConstructor(access=AccessLevel.PRIVATE)
 @Builder(builderClassName="Builder",toBuilder=true)
 public class PluginConfigurations {
+    /*
+     * Note:
+     *     Jakarta JAXB 4 has these dependencies and in total with tools and runtime dependencies and everything:
+     *         1) 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+     *         2) 'jakarta.activation:jakarta.activation-api:2.1.0'
+     *         3) 'org.eclipse.angus:angus-activation:1.0.0'
+     *         4) 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+     *         5) 'com.sun.xml.bind:jaxb-core:4.0.1'
+     *         6) 'com.sun.xml.bind:jaxb-impl:4.0.1'
+     *         7) 'com.sun.xml.bind:jaxb-xjc:4.0.1'  //XJC
+     *         8) 'com.sun.xml.bind:jaxb-jxc:4.0.1'  //JXC/SchemaGen
+     *     See https://eclipse-ee4j.github.io/jaxb-ri/ !
+     */
 
-    public final static String SCHEMA_REFERENCE_CONFIGURATION_NAME="schemaReference";
+    /**
+     * Name of configuration to be used by task "xjc".
+     */
+    public static final String XJC_CONFIGURATION_NAME="xjc";
 
-    public final static String SCHEMA_INCLUSION_CONFIGURATION_NAME="schemaInclusion";
+    /**
+     * Name of configuration to be used by task "jxc".
+     */
+    public static final String JXC_CONFIGURATION_NAME="jxc";
 
-    private final NamedDomainObjectProvider<Configuration> schemaReferenceConfigurationProvider;
-    private final NamedDomainObjectProvider<Configuration> schemaInclusionConfigurationProvider;
+    /**
+     * Default dependencies for configuration {@link #XJC_CONFIGURATION_NAME}.
+     */
+    public static final List<String> xjcDefaultDependencies=
+        List.of("com.sun.xml.bind:jaxb-xjc:4.0.1");
 
+    /**
+     * Default dependencies for configuration {@link #JXC_CONFIGURATION_NAME}.
+     */
+    public static final List<String> jxcDefaultDependencies =
+        List.of("com.sun.xml.bind:jaxb-jxc:4.0.1");
+
+    /**
+     * Registered provider of configuration named {@link #XJC_CONFIGURATION_NAME}.
+     */
+    private final NamedDomainObjectProvider<Configuration> xjcConfigurationProvider;
+
+    /**
+     * Registered provider of configuration named {@link #JXC_CONFIGURATION_NAME}.
+     */
+    private final NamedDomainObjectProvider<Configuration> jxcConfigurationProvider;
+
+    /**
+     * Registers all plugin configurations.
+     * @param project Project.
+     * @return Plugin configurations.
+     */
     public static PluginConfigurations register(Project project) {
         ConfigurationContainer configurations=project.getConfigurations();
-        return register(configurations);
-    }
-
-    public static PluginConfigurations register(ConfigurationContainer configurations) {
         Builder builder=builder();
-        builder.schemaInclusionConfigurationProvider(configurations.register(SCHEMA_REFERENCE_CONFIGURATION_NAME));
-        builder.schemaInclusionConfigurationProvider(configurations.register(SCHEMA_INCLUSION_CONFIGURATION_NAME));
+        builder.xjcConfigurationProvider(configurations.register(XJC_CONFIGURATION_NAME,configuration -> {
+            configuration.setVisible(false);
+            configuration.setCanBeConsumed(false);
+            configuration.setCanBeResolved(true);
+            configuration.setDescription("JAXB dependencies for generation of sources from schema.");
+            configuration.defaultDependencies(dependencySet->xjcDefaultDependencies.forEach(dependencyNotation->dependencySet.add(project.getDependencies().create(dependencyNotation))));
+        }));
+        builder.jxcConfigurationProvider(configurations.register(JXC_CONFIGURATION_NAME,configuration -> {
+            configuration.setVisible(false);
+            configuration.setCanBeConsumed(false);
+            configuration.setCanBeResolved(true);
+            configuration.setDescription("JAXB dependencies for generation of schema from sources.");
+            configuration.defaultDependencies(dependencySet->jxcDefaultDependencies.forEach(dependencyNotation->dependencySet.add(project.getDependencies().create(dependencyNotation))));
+        }));
         return builder.build();
     }
 }

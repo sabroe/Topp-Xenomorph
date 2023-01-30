@@ -21,9 +21,6 @@ import java.util.function.IntConsumer;
  */
 @UtilityClass
 public class XJCUtility {
-
-
-
     public static int run(List<String> args,
                           PrintStream out,
                           PrintStream err) throws Exception {
@@ -65,5 +62,9 @@ public class XJCUtility {
                 }
             );
         }
+    }
+
+    public static void showHelp(PrintStream out) {
+        out.println("TODO");
     }
 }

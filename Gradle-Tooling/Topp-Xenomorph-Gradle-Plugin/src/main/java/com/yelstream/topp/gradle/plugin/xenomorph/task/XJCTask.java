@@ -13,10 +13,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.internal.file.FileOperations;
 import org.gradle.api.logging.Logger;
@@ -52,17 +53,17 @@ import java.util.function.Supplier;
  */
 public abstract class XJCTask extends DefaultTask {
     /**
-     *
+     * Task name.
      */
     public static final String TASK_NAME="xjc";
 
     /**
-     *
+     * Task description.
      */
     public static final String DESCRIPTION="Generates JAXB objects from XML Schema (W3C XML Schema/XML DTD/XML inside WSDL).";
 
     /**
-     *
+     * Name of task group.
      */
     public static final String GROUP_NAME="build";
 
@@ -96,7 +97,7 @@ public abstract class XJCTask extends DefaultTask {
                       TASK_OUTPUT_DIRECTORY_NAME,
                       "java/src");
 
-    private Supplier<PluginContext> pluginContextSupplier;
+    private final Supplier<PluginContext> pluginContextSupplier;
 
     @Inject
     protected abstract FileOperations getFileOperations();
@@ -107,25 +108,14 @@ public abstract class XJCTask extends DefaultTask {
     @Inject
     protected abstract ProjectLayout getProjectLayout();
 
+    @Getter(onMethod_={@InputFiles})
     private final ConfigurableFileCollection inputSchemaFiles;
-    @InputFiles
-    public ConfigurableFileCollection getInputSchemaFiles() { return inputSchemaFiles; }
 
+    @Getter(onMethod_={@Classpath})
+    private final NamedDomainObjectProvider<Configuration> xjcDependencies;
+
+    @Getter(onMethod_={@OutputDirectory})
     private final DirectoryProperty outputDirectory;
-    @OutputDirectory
-    public DirectoryProperty getOutputDirectory() { return outputDirectory; }
-
-/*
-    @Classpath
-    public NamedDomainObjectProvider<Configuration> getSchemaReferenceConfiguration() { return schemaReferenceConfiguration; }
-    private final NamedDomainObjectProvider<Configuration> schemaReferenceConfiguration;
-*/
-
-    private final FileCollection compileClassPathMainJavaFileCollection;
-    @Classpath
-    public FileCollection getCompileClassPathMainJavaFileCollection() { return compileClassPathMainJavaFileCollection; }
-
-    private ResourceLoaderContainer resourceLoaderContainer;
 
     @Optional
     @Getter(onMethod_={@Input})
@@ -153,6 +143,7 @@ public abstract class XJCTask extends DefaultTask {
     private Boolean optionDry;
 
     @Inject
+    @SuppressWarnings("java:S5993")
     public XJCTask(Supplier<PluginContext> pluginContextSupplier) {
         this.pluginContextSupplier=pluginContextSupplier;
 
@@ -162,12 +153,14 @@ public abstract class XJCTask extends DefaultTask {
         Project project=getProject();
         File buildDir=project.getBuildDir();
 
+        xjcDependencies=pluginContextSupplier.get().getPluginConfigurations().getXjcConfigurationProvider();
+
         inputSchemaFiles=getObjectFactory().fileCollection().from(RESOURCES_DIRECTORY_NAME);
         outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(OUTPUT_DIRECTORY_NAME));
 
-        resourceLoaderContainer=new ResourceLoaderContainer(getProject(),pluginContextSupplier.get().getPluginConfigurations());
+//        resourceLoaderContainer=new ResourceLoaderContainer(getProject(),pluginContextSupplier.get().getPluginConfigurations());
 //        schemaReferenceConfiguration=resourceLoaderContainer.getSchemaReferenceConfiguration();
-        compileClassPathMainJavaFileCollection=resourceLoaderContainer.getCompileClassPathMainJavaFileCollection();
+//        compileClassPathMainJavaFileCollection=resourceLoaderContainer.getCompileClassPathMainJavaFileCollection();
 
 
         project.getPluginManager().withPlugin("java", appliedPlugin->{
@@ -198,6 +191,7 @@ public abstract class XJCTask extends DefaultTask {
         private final XJCExtension.Run run;
     }
 
+    @SuppressWarnings("java:S106")
     @TaskAction
     public void run() throws TaskExecutionException {
         Project project=getProject();
@@ -226,8 +220,7 @@ public abstract class XJCTask extends DefaultTask {
             }
 
             if (optionHelp==Boolean.TRUE || taskProperties.containsKey("help")) {
-                List<String> args=List.of("-help");
-                XJCUtility.executeCommandToConsole(args,Status.EMPTY_STATUS_VERIFIER);
+                XJCUtility.showHelp(System.out);
             }
 
             XJCExtension extension=XJCExtension.get(project);
@@ -406,7 +399,7 @@ public abstract class XJCTask extends DefaultTask {
                 }
             }
 
-            if (options.isEnableIntrospection()) {
+            if (options.isEnableIntrospection()!=false) {
                 args.add("-enableIntrospection");
             }
 
@@ -484,7 +477,7 @@ public abstract class XJCTask extends DefaultTask {
                 args.add("-Xsync-methods");
             }
 
-            if (extensions.isMarkGenerated()) {
+            if (extensions.isMarkGenerated()!=false) {
                 args.add("-mark-generated");
             }
 
@@ -534,11 +527,4 @@ public abstract class XJCTask extends DefaultTask {
             }
         }
     }
-
-    /*
-JAXBContext jaxbContext = JAXBContext.newInstance(packageName);
-Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-Graphml graphml= (Graphml) jaxbUnmarshaller.unmarshal(xmlFile);
-     */
-
 }
