@@ -5,6 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.PathValidation;
 import org.gradle.api.Project;
+import org.gradle.api.file.SourceDirectorySet;
+import org.gradle.api.plugins.JavaPluginExtension;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetContainer;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -28,6 +32,12 @@ public class ResourceFactory {
 
     private File defaultResourceDir;
 
+    /*
+    https://www.baeldung.com/gradle-source-sets
+    https://unbroken-dome.github.io/projects/gradle-xjc-plugin/
+    https://github.com/unbroken-dome/gradle-xjc-plugin
+     */
+
     public File getResourceDir() {
         File dir;
         if (defaultResourceDir!=null) {
@@ -35,6 +45,29 @@ public class ResourceFactory {
         } else {
             dir=project.file("src/main/resources");  //TODO: Get this from the Java plugin and the main sourceset!
         }
+
+/*
+            JavaPluginExtension javaPluginExtension=project.getExtensions().getByType(JavaPluginExtension.class);
+            SourceSetContainer javaSourceSets=javaPluginExtension.getSourceSets();
+
+            javaSourceSets.forEach(s->System.out.println("Sources-set name: "+s.getName()));
+
+            SourceSet mainJavaSourceSet=javaSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+            SourceDirectorySet resources=mainJavaSourceSet.getResources();
+System.out.println("XXX: resources="+resources);
+System.out.println("XXX: dirs="+resources.getSrcDirs());
+
+        SourceSet mainJavaSourceSet2=javaSourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME);
+        SourceDirectorySet resources2=mainJavaSourceSet2.getResources();
+        System.out.println("XXX2: resources="+resources2);
+        System.out.println("XXX2: dirs="+resources2.getSrcDirs());
+*/
+
+/*
+            String dir=new File(buildDir,OUTPUT_DIRECTORY_NAME).toString();
+            mainJavaSourceSet.getJava().srcDir(dir);
+*/
+
         return dir;
     }
 

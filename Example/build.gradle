@@ -24,6 +24,14 @@ sourceSets {
     }
 }
 
+sourceSets{
+    itest {
+        java {
+            srcDirs("src/itest")
+        }
+    }
+}
+
 xenomorph {
     xjc {
 //        resourceDir = project.file('src/main/resources')
