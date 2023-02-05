@@ -1,6 +1,7 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
 import com.yelstream.topp.command.Status;
+import com.yelstream.topp.gradle.plugin.xenomorph.XenomorphPlugin;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtension;
 import com.yelstream.topp.gradle.plugin.xenomorph.tool.XJCUtility;
@@ -12,16 +13,23 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.ProjectLayout;
+import org.gradle.api.file.SourceDirectorySet;
+import org.gradle.api.internal.AbstractNamedDomainObjectContainer;
 import org.gradle.api.internal.file.FileOperations;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.plugins.ExtensionContainer;
+import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
@@ -171,7 +179,33 @@ public abstract class XJCTask extends DefaultTask {
             String dir=new File(buildDir,OUTPUT_DIRECTORY_NAME).toString();
             mainJavaSourceSet.getJava().srcDir(dir);
         });
+
+
+{
+    JavaPluginExtension javaPluginExtension=project.getExtensions().getByType(JavaPluginExtension.class);
+    SourceSetContainer javaSourceSets=javaPluginExtension.getSourceSets();
+
+    javaSourceSets.forEach(s->System.out.println("Sources-set name: "+s.getName()));
+
+    SourceSet mainJavaSourceSet=javaSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+    SourceDirectorySet resources=mainJavaSourceSet.getResources();
+    System.out.println("XXX: resources="+resources);
+    System.out.println("XXX: dirs="+resources.getSrcDirs());
+
+    SourceSet mainJavaSourceSet2=javaSourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME);
+    SourceDirectorySet resources2=mainJavaSourceSet2.getResources();
+    System.out.println("XXX2: resources="+resources2);
+    System.out.println("XXX2: dirs="+resources2.getSrcDirs());
+
+    ExtensionContainer ex=mainJavaSourceSet.getExtensions();
+
+
+    XJCExtension x=(XJCExtension)javaPluginExtension.getSourceSets().getByName("main").getExtensions().getByName("xjc");
+    System.out.println("Lookup(2): "+x+", "+x.getRuns().size());
+
+}
     }
+
 
     public static final Set<String> validTaskPropertyKeys=Set.of("native-help","native-version","native-fullversion","dry","help");
 

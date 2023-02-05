@@ -33,8 +33,42 @@ sourceSets{
 }
 
 xenomorph {
-    xjc {
+    sourceSets {
+        main {
+/*
+            xjc {
 //        resourceDir = project.file('src/main/resources')
+                run {
+                    name = 'Test generation of ISO 20022 XML Schema'
+                    enable = true
+                    sourceSchema += schema.of(resource.file('xsd/pain.001.001.02.xsd'))
+                    options {
+                        bindingFile += resource.file('xjb/mapping.xjb')
+                    }
+                    extensions {
+                    }
+                }
+                run {
+                    name = 'Test generation of GraphML XML Schema'
+                    enable = true
+                    sourceSchema += schema.of(resource.file('xsd/GraphML/graphml-parseinfo.xsd'))
+                    sourceSchema += schema.of(resource.file('xsd/GraphML/graphml-attributes.xsd'))
+                    options {
+                        catalogFile = resource.file('cat/catalog.cat')
+                        targetPackage = 'org.graphdrawing.graphml._1_0'
+                    }
+                    extensions {
+                    }
+                }
+            }
+*/
+        }
+    }
+}
+
+xenomorph {
+    xjc {
+        resource.defaultResourceDir = project.file('src/main/resources')
         run {
             name = 'Test generation of ISO 20022 XML Schema'
             enable = true

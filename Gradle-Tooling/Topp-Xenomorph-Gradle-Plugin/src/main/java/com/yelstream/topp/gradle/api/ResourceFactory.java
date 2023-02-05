@@ -1,14 +1,18 @@
 package com.yelstream.topp.gradle.api;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.Singular;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.PathValidation;
 import org.gradle.api.Project;
 import org.gradle.api.file.SourceDirectorySet;
-import org.gradle.api.plugins.JavaPluginExtension;
+import org.gradle.api.logging.LogLevel;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.SourceSetContainer;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -16,59 +20,155 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Set;
 
 /**
- *
+ * Resolves file and path objects.
  *
  * @author Morten Sabroe Mortenen
  * @version 1.0
  * @since 2023-01-23
  */
-@Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
+@lombok.Builder(builderClassName="Builder",toBuilder=true)
 public class ResourceFactory {
 
+    @Getter(AccessLevel.PROTECTED)
     private final Project project;
 
+    @Getter(AccessLevel.PROTECTED)
+    @Singular
+    private final List<Resolver> resolvers;
+
+    @Getter(AccessLevel.PROTECTED)
+    @lombok.Builder.Default
+    private final Logger logger=null;
+
+    @Getter(AccessLevel.PROTECTED)
+    @lombok.Builder.Default
+    private final LogLevel level=LogLevel.INFO;
+
+    @Getter
+    @Setter
     private File defaultResourceDir;
 
-    /*
-    https://www.baeldung.com/gradle-source-sets
-    https://unbroken-dome.github.io/projects/gradle-xjc-plugin/
-    https://github.com/unbroken-dome/gradle-xjc-plugin
-     */
+    protected Logger getLogger() {
+        return logger!=null?logger:project.getLogger();
+    }
 
-    public File getResourceDir() {
-        File dir;
-        if (defaultResourceDir!=null) {
-            dir=defaultResourceDir;
-        } else {
-            dir=project.file("src/main/resources");  //TODO: Get this from the Java plugin and the main sourceset!
+    @FunctionalInterface
+    public interface Resolver {
+        File resolve(ResourceFactory resourceFactory,
+                     File file);
+
+        default Path resolve(ResourceFactory resourceFactory,
+                             Path path) {
+            return resolve(resourceFactory,path.toFile()).toPath();
         }
+    }
 
-/*
-            JavaPluginExtension javaPluginExtension=project.getExtensions().getByType(JavaPluginExtension.class);
-            SourceSetContainer javaSourceSets=javaPluginExtension.getSourceSets();
+    @AllArgsConstructor(staticName="of")
+    public static class ProjectResolver implements Resolver {
+        @Getter
+        private final Project project;
 
-            javaSourceSets.forEach(s->System.out.println("Sources-set name: "+s.getName()));
+        @Override
+        public File resolve(ResourceFactory resourceFactory,
+                            File file) {
+            File resolved=null;
+            {
+                Logger logger=resourceFactory.getLogger();
+                LogLevel level=resourceFactory.level;
+                File projectDir=project.getProjectDir();
+                File candicateFile=new File(projectDir,file.getPath());
+                if (logger.isEnabled(level)) {
+                    logger.log(level,String.format("Trying resolve of file against project; file is %s!",file));
+                }
+                if (candicateFile.exists()) {
+                    resolved=candicateFile;
+                }
+            }
+            return resolved;
+        }
+    }
 
-            SourceSet mainJavaSourceSet=javaSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
-            SourceDirectorySet resources=mainJavaSourceSet.getResources();
-System.out.println("XXX: resources="+resources);
-System.out.println("XXX: dirs="+resources.getSrcDirs());
+    @AllArgsConstructor(staticName="of")
+    public static class SourceSetResolver implements Resolver {
+        @Getter
+        private final SourceSet sourceSet;
 
-        SourceSet mainJavaSourceSet2=javaSourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME);
-        SourceDirectorySet resources2=mainJavaSourceSet2.getResources();
-        System.out.println("XXX2: resources="+resources2);
-        System.out.println("XXX2: dirs="+resources2.getSrcDirs());
-*/
+        @Override
+        public File resolve(ResourceFactory resourceFactory,
+                            File file) {
+            File resolved=null;
+            {
+                Logger logger=resourceFactory.getLogger();
+                LogLevel level=resourceFactory.level;
+                SourceDirectorySet resources=sourceSet.getResources();
+                Set<File> dirs=resources.getSrcDirs();
+                for (File dir: dirs) {
+                    File candicateFile=new File(dir,file.getPath());
+                    if (logger.isEnabled(level)) {
+                        logger.log(level,String.format("Trying resolve of file against source-set; file is %s, source-set is %s!",file,sourceSet));
+                    }
+                    if (candicateFile.exists()) {
+                        resolved=candicateFile;
+                        break;
+                    }
+                }
+            }
+            return resolved;
+        }
+    }
 
-/*
-            String dir=new File(buildDir,OUTPUT_DIRECTORY_NAME).toString();
-            mainJavaSourceSet.getJava().srcDir(dir);
-*/
+    @AllArgsConstructor(staticName="of")
+    public static class ResourceDirectoryResolver implements Resolver {
+        @Getter
+        private final File resourceDirectory;
 
-        return dir;
+        @Override
+        public File resolve(ResourceFactory resourceFactory,
+                            File file) {
+            File resolved=null;
+            {
+                Logger logger=resourceFactory.getLogger();
+                LogLevel level=resourceFactory.level;
+                File candicateFile=new File(resourceDirectory,file.getPath());
+                if (logger.isEnabled(level)) {
+                    logger.log(level,String.format("Trying resolve of file against resource directory; file is %s, resource directory is %s!",file,resourceDirectory));
+                }
+                if (candicateFile.exists()) {
+                    resolved=candicateFile;
+                }
+            }
+            return resolved;
+        }
+    }
+
+    @AllArgsConstructor(staticName="of")
+    public static class DefaultResourceDirectoryResolver implements Resolver {
+        @Override
+        public File resolve(ResourceFactory resourceFactory,
+                            File file) {
+            File resolved=null;
+            {
+                Logger logger=resourceFactory.getLogger();
+                LogLevel level=resourceFactory.level;
+                File resourceDirectory=resourceFactory.getDefaultResourceDir();
+                if (resourceDirectory!=null) {
+                    File candicateFile=new File(resourceDirectory,file.getPath());
+                    if (logger.isEnabled(level)) {
+                        logger.log(level,String.format("Trying resolve of file against default resource directory; file is %s, default resource directory is %s!",file,resourceDirectory));
+                    }
+                    if (candicateFile.exists()) {
+                        resolved=candicateFile;
+                    }
+                }
+            }
+            return resolved;
+        }
     }
 
     /**
@@ -155,8 +255,8 @@ System.out.println("XXX: dirs="+resources.getSrcDirs());
             throw new IllegalArgumentException("Failure to resolve path reference; reference is not set!");
         }
         if (reference instanceof String name) {
-            Path path=getResourceDir().toPath().resolve(name);
-            resolved=path.toAbsolutePath();
+            Path path=Paths.get(name);
+            resolved=resolve(path);
         } else {
             if (reference instanceof File file) {
                 resolved=resolve(file).toPath();
@@ -276,11 +376,29 @@ System.out.println("XXX: dirs="+resources.getSrcDirs());
      * @return Resolved file.
      */
     public File resolve(File file) {
-        File resolved;
+        File resolved=null;
         if (file.isAbsolute()) {
             resolved=file;
         } else {
-            resolved=new File(getResourceDir(),file.getPath());
+            if (resolvers==null) {
+                throw new IllegalStateException(String.format("Failure to resolve file; no resolvers are present, file is %s!",file));
+            } else {
+                for (Resolver resolver: resolvers) {
+                    resolved=resolver.resolve(this,file);
+                    if (resolved!=null) {
+                        break;
+                    }
+                }
+            }
+            if (resolved==null) {
+                throw new IllegalStateException(String.format("Failure to resolve file; resolvers not able to resolve file, file is %s!",file));
+            }
+            if (!resolved.isAbsolute()) {
+                throw new IllegalStateException(String.format("Failure to resolve file; resolved file is not absolute, file is %s, resolved file is %s!",file,resolved));
+            }
+            if (!resolved.exists()) {
+                throw new IllegalStateException(String.format("Failure to resolve file; resolved file does not exist, file is %s, resolved file is %s!",file,resolved));
+            }
         }
         return resolved;
     }
@@ -291,13 +409,48 @@ System.out.println("XXX: dirs="+resources.getSrcDirs());
      * @return Resolved path.
      */
     public Path resolve(Path path) {
-        Path resolved;
+        Path resolved=null;
         if (path.isAbsolute()) {
             resolved=path;
         } else {
-            Path projectDir=getResourceDir().toPath();
-            resolved=projectDir.resolve(path);
+            if (resolvers==null) {
+                throw new IllegalStateException(String.format("Failure to resolve path; no resolvers are present, path is %s!",path));
+            } else {
+                for (Resolver resolver: resolvers) {
+                    resolved=resolver.resolve(this,path);
+                    if (resolved!=null) {
+                        break;
+                    }
+                }
+            }
+            if (resolved==null) {
+                throw new IllegalStateException(String.format("Failure to resolve path; resolvers not able to resolve path, path is %s!",path));
+            }
+            if (!resolved.isAbsolute()) {
+                throw new IllegalStateException(String.format("Failure to resolve path; resolved file is not absolute, path is %s, resolved path is %s!",path,resolved));
+            }
+            if (Files.notExists(path)) {
+                throw new IllegalStateException(String.format("Failure to resolve path; resolved file does not exist, path is %s, resolved path is %s!",path,resolved));
+            }
         }
         return resolved;
+    }
+
+
+    public static ResourceFactory of(Project project) {
+        Builder builder=ResourceFactory.builder();
+        builder.project(project);
+        builder.resolver(ResourceFactory.DefaultResourceDirectoryResolver.of());
+        builder.resolver(ResourceFactory.ProjectResolver.of(project));
+        return builder.build();
+    }
+
+    public static ResourceFactory of(Project project,
+                                     SourceSet sourceSet) {
+        Builder builder=ResourceFactory.builder();
+        builder.project(project);
+        builder.resolver(ResourceFactory.DefaultResourceDirectoryResolver.of());
+        builder.resolver(ResourceFactory.SourceSetResolver.of(sourceSet));
+        return builder.build();
     }
 }

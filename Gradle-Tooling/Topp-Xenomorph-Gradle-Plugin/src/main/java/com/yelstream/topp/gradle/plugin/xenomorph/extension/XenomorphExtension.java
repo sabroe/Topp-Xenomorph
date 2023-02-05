@@ -1,6 +1,7 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.extension;
 
 import com.yelstream.topp.gradle.api.ResourceFactory;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.gradle.api.Project;
 
@@ -19,15 +20,12 @@ public class XenomorphExtension {
 
     public XenomorphExtension(Project project) {
         this.project=project;
-        resource=new ResourceFactory(project);
         xjc=XJCExtension.get(project);
         schemaGen=SchemaGenExtension.get(project);
     }
 
+    @Getter(AccessLevel.PROTECTED)
     private final Project project;
-
-    @Getter
-    private final ResourceFactory resource;
 
     @Getter
     private final XJCExtension xjc;
