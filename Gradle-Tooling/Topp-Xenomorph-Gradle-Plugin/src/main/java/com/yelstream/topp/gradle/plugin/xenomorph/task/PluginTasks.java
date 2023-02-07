@@ -76,6 +76,7 @@ public class PluginTasks {
         project.getPluginManager().withPlugin("java"/*JavaBasePlugin*/,appliedPlugin->{
             TaskContainer tasks=project.getTasks();
             Task compileJavaTask=tasks.getByName(JavaPlugin.COMPILE_JAVA_TASK_NAME);
+//TODO: COMPILE_TEST_JAVA_TASK_NAME
 
             compileJavaTask.dependsOn(xjcTaskProvider);
             compileJavaTask.dependsOn(schemaGenTaskProvider);

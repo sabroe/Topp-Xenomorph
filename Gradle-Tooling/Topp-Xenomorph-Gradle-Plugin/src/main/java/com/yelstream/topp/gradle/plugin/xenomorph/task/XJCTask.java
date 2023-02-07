@@ -161,7 +161,7 @@ public abstract class XJCTask extends DefaultTask {
         Project project=getProject();
         File buildDir=project.getBuildDir();
 
-        xjcDependencies=pluginContextSupplier.get().getPluginConfigurations().getXjcConfigurationProvider();
+        xjcDependencies=pluginContextSupplier.get().getPluginConfigurations().getXjcConfigurationProvider("xjc");  //NOTE: CONFIGURATION HERE!
 
         inputSchemaFiles=getObjectFactory().fileCollection().from(RESOURCES_DIRECTORY_NAME);
         outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(OUTPUT_DIRECTORY_NAME));
@@ -175,6 +175,7 @@ public abstract class XJCTask extends DefaultTask {
             JavaPluginExtension javaPluginExtension=project.getExtensions().getByType(JavaPluginExtension.class);
             SourceSetContainer javaSourceSets=javaPluginExtension.getSourceSets();
             SourceSet mainJavaSourceSet=javaSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+javaSourceSets.forEach(x->System.out.println("XXX(2): "+x.getName()));
 
             String dir=new File(buildDir,OUTPUT_DIRECTORY_NAME).toString();
             mainJavaSourceSet.getJava().srcDir(dir);
@@ -232,8 +233,8 @@ public abstract class XJCTask extends DefaultTask {
         Logger logger=getLogger();
         Tasks.logHello(this);
 
-        Map<String, Object> projectProperties = Projects.getProjectProperties(project);
-        Map<String, Object> taskProperties = Tasks.getTaskProperties(this);
+        Map<String,Object> projectProperties=Projects.getProjectProperties(project);
+        Map<String,Object> taskProperties=Tasks.getTaskProperties(this);
 
         try {
             Tasks.verifyTaskPropertyKeys(this, validTaskPropertyKeys);

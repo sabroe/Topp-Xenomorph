@@ -44,23 +44,6 @@ public class XenomorphPlugin implements Plugin<Project> {
      */
     private PluginContext pluginContext;
 
-//https://stackoverflow.com/questions/42040560/how-to-add-new-language-source-directories-in-gradle-plugin
-//https://www.programcreek.com/java-api-examples/?api=org.gradle.api.tasks.SourceSetContainer
-
-    @Getter
-    @Setter
-//    @NoArgsConstructor
-    public static class MyExtension {
-        private String foo;
-
-        static int count=0;
-
-        public MyExtension() {
-            count++;
-            System.out.println("Count: "+count);
-        }
-    }
-
     @Override
     public void apply(Project project) {
         Supplier<PluginContext> pluginContextSupplier=()->pluginContext;
@@ -71,8 +54,10 @@ public class XenomorphPlugin implements Plugin<Project> {
 
         {
             JavaPluginExtension javaPluginExtension=project.getExtensions().getByType(JavaPluginExtension.class);
+javaPluginExtension.getSourceSets().forEach(x->System.out.println("XXX(3): "+x.getName()));
             javaPluginExtension.getSourceSets().all(
                     sourceSet -> {
+
                 String name="qqq"+sourceSet.getName();
                 ExtensionContainer ex=sourceSet.getExtensions();
                 XJCExtension myExtension=ex.create(XJCExtension.EXTENSION_NAME, XJCExtension.class, project, sourceSet);
@@ -85,62 +70,25 @@ System.out.println("Extension qqqmain: "+ex.findByName("xjc"));
             XJCExtension x=(XJCExtension)javaPluginExtension.getSourceSets().getByName("main").getExtensions().getByName("xjc");
             System.out.println("Lookup: "+x+", "+x.getRuns().size());
         }
-    }
-}
 
-// TODO: take inspiration from https://github.com/gradle/gradle/blob/master/subprojects/plugins/src/main/java/org/gradle/api/tasks/GroovySourceSet.java
-interface UmpleSourceSet {
-    SourceDirectorySet getUmple();
-    UmpleSourceSet umple(Closure<UmpleSourceSet> configureClosure);
-//    UmpleSourceSet umple(Action<? super SourceDirectorySet> configureAction);
-    UmpleSourceSet umple(Action<? super SourceDirectorySet> configureAction);
-    SourceDirectorySet getAllUmple();
-}
+        //https://docs.gradle.org/current/userguide/java_plugin.html
 
-// TODO: take inspiration from https://github.com/gradle/gradle/blob/master/subprojects/plugins/src/main/java/org/gradle/api/internal/tasks/DefaultGroovySourceSet.java
-class DefaultUmpleSourceSet implements UmpleSourceSet, HasPublicType {
-
-    private final DefaultUmpleSourceSet groovy;
-    private final SourceDirectorySet allUmple;
-
-    @Inject
-    public DefaultUmpleSourceSet(String name, String displayName, ObjectFactory objectFactory) {
-        this.groovy = createGroovySourceDirectorySet(name, displayName, objectFactory);
-        allUmple = objectFactory.sourceDirectorySet("all" + name, displayName + " Groovy source");
-//      allUmple.source(groovy);
-        allUmple.getFilter().include("**/*.groovy");
-    }
-
-    private static DefaultUmpleSourceSet createGroovySourceDirectorySet(String name, String displayName, ObjectFactory objectFactory) {
-        DefaultUmpleSourceSet groovySourceDirectorySet = objectFactory.newInstance(DefaultUmpleSourceSet.class, objectFactory.sourceDirectorySet(name, displayName + " Groovy source"));
-//        groovySourceDirectorySet.getFilter().include("**/*.java", "**/*.groovy");
-        return groovySourceDirectorySet;
-    }
-
-    @Override
-    public SourceDirectorySet getUmple() {
-        return allUmple;
-    }
-
-    @Override
-    public UmpleSourceSet umple(Closure configureClosure) {
-        configure(configureClosure, getUmple());
-        return this;
-    }
-
-    @Override
-    public UmpleSourceSet umple(Action<? super SourceDirectorySet> configureAction) {
-        configureAction.execute(getUmple());
-        return this;
-    }
-
-    @Override
-    public SourceDirectorySet getAllUmple() {
-        return null;
-    }
-
-    @Override
-    public TypeOf<?> getPublicType() {
-        return typeOf(UmpleSourceSet.class);
+        /*
+         * Tasks:
+         *     xjc
+         *     xjcTest
+         *     xjcIntegrationTest
+         *     ...
+         * Configurations:
+         *     xjc
+         *     xjcTest
+         *     xjcIntegrationTest
+         *     ...
+         * Extensions (in addition to SourceSet-extensions):
+         *     xjc
+         *     xjcTest
+         *     xjcIntegrationTest
+         *     ...
+         */
     }
 }

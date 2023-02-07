@@ -2,7 +2,6 @@ package com.yelstream.topp.gradle.api;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
@@ -26,6 +25,10 @@ import java.util.Set;
 
 /**
  * Resolves file and path objects.
+ * Instances of this should be exposed to Gradle scripts.
+ * <p>
+ *     Note that field-specific getters or setters must be kept hidden from Gradle scripts and per design.
+ * </p>
  *
  * @author Morten Sabroe Mortenen
  * @version 1.0
@@ -42,7 +45,9 @@ public class ResourceFactory {
     @Singular
     private final List<Resolver> resolvers;
 
-    @Getter(AccessLevel.PROTECTED)
+    @lombok.Builder.Default
+    private final boolean failOnUnresolved=true;
+
     @lombok.Builder.Default
     private final Logger logger=null;
 
@@ -84,7 +89,7 @@ public class ResourceFactory {
                 File projectDir=project.getProjectDir();
                 File candicateFile=new File(projectDir,file.getPath());
                 if (logger.isEnabled(level)) {
-                    logger.log(level,String.format("Trying resolve of file against project; file is %s!",file));
+                    logger.log(level,String.format("Trying to resolve file against project; file is %s, candidate file is %s!",file,candicateFile));
                 }
                 if (candicateFile.exists()) {
                     resolved=candicateFile;
@@ -111,7 +116,7 @@ public class ResourceFactory {
                 for (File dir: dirs) {
                     File candicateFile=new File(dir,file.getPath());
                     if (logger.isEnabled(level)) {
-                        logger.log(level,String.format("Trying resolve of file against source-set; file is %s, source-set is %s!",file,sourceSet));
+                        logger.log(level,String.format("Trying to resolve file against source-set; file is %s, source-set is %s, candidate file is %s!",file,sourceSet,candicateFile));
                     }
                     if (candicateFile.exists()) {
                         resolved=candicateFile;
@@ -137,7 +142,7 @@ public class ResourceFactory {
                 LogLevel level=resourceFactory.level;
                 File candicateFile=new File(resourceDirectory,file.getPath());
                 if (logger.isEnabled(level)) {
-                    logger.log(level,String.format("Trying resolve of file against resource directory; file is %s, resource directory is %s!",file,resourceDirectory));
+                    logger.log(level,String.format("Trying to resolve file against resource directory; file is %s, resource directory is %s, candidate file is %s!",file,resourceDirectory,candicateFile));
                 }
                 if (candicateFile.exists()) {
                     resolved=candicateFile;
@@ -160,7 +165,7 @@ public class ResourceFactory {
                 if (resourceDirectory!=null) {
                     File candicateFile=new File(resourceDirectory,file.getPath());
                     if (logger.isEnabled(level)) {
-                        logger.log(level,String.format("Trying resolve of file against default resource directory; file is %s, default resource directory is %s!",file,resourceDirectory));
+                        logger.log(level,String.format("Trying to resolve file against default resource directory; file is %s, default resource directory is %s, candidate file is %s!",file,resourceDirectory,candicateFile));
                     }
                     if (candicateFile.exists()) {
                         resolved=candicateFile;
@@ -390,14 +395,16 @@ public class ResourceFactory {
                     }
                 }
             }
-            if (resolved==null) {
-                throw new IllegalStateException(String.format("Failure to resolve file; resolvers not able to resolve file, file is %s!",file));
-            }
-            if (!resolved.isAbsolute()) {
-                throw new IllegalStateException(String.format("Failure to resolve file; resolved file is not absolute, file is %s, resolved file is %s!",file,resolved));
-            }
-            if (!resolved.exists()) {
-                throw new IllegalStateException(String.format("Failure to resolve file; resolved file does not exist, file is %s, resolved file is %s!",file,resolved));
+            if (failOnUnresolved) {
+                if (resolved==null) {
+                    throw new IllegalStateException(String.format("Failure to resolve file; resolvers not able to resolve file, file is %s!",file));
+                }
+                if (!resolved.isAbsolute()) {
+                    throw new IllegalStateException(String.format("Failure to resolve file; resolved file is not absolute, file is %s, resolved file is %s!",file,resolved));
+                }
+                if (!resolved.exists()) {
+                    throw new IllegalStateException(String.format("Failure to resolve file; resolved file does not exist, file is %s, resolved file is %s!",file,resolved));
+                }
             }
         }
         return resolved;
@@ -423,14 +430,16 @@ public class ResourceFactory {
                     }
                 }
             }
-            if (resolved==null) {
-                throw new IllegalStateException(String.format("Failure to resolve path; resolvers not able to resolve path, path is %s!",path));
-            }
-            if (!resolved.isAbsolute()) {
-                throw new IllegalStateException(String.format("Failure to resolve path; resolved file is not absolute, path is %s, resolved path is %s!",path,resolved));
-            }
-            if (Files.notExists(path)) {
-                throw new IllegalStateException(String.format("Failure to resolve path; resolved file does not exist, path is %s, resolved path is %s!",path,resolved));
+            if (failOnUnresolved) {
+                if (resolved==null) {
+                    throw new IllegalStateException(String.format("Failure to resolve path; resolvers not able to resolve path, path is %s!",path));
+                }
+                if (!resolved.isAbsolute()) {
+                    throw new IllegalStateException(String.format("Failure to resolve path; resolved file is not absolute, path is %s, resolved path is %s!",path,resolved));
+                }
+                if (Files.notExists(path)) {
+                    throw new IllegalStateException(String.format("Failure to resolve path; resolved file does not exist, path is %s, resolved path is %s!",path,resolved));
+                }
             }
         }
         return resolved;
@@ -442,6 +451,7 @@ public class ResourceFactory {
         builder.project(project);
         builder.resolver(ResourceFactory.DefaultResourceDirectoryResolver.of());
         builder.resolver(ResourceFactory.ProjectResolver.of(project));
+        builder.failOnUnresolved(false);
         return builder.build();
     }
 
@@ -451,6 +461,7 @@ public class ResourceFactory {
         builder.project(project);
         builder.resolver(ResourceFactory.DefaultResourceDirectoryResolver.of());
         builder.resolver(ResourceFactory.SourceSetResolver.of(sourceSet));
+        builder.failOnUnresolved(false);
         return builder.build();
     }
 }

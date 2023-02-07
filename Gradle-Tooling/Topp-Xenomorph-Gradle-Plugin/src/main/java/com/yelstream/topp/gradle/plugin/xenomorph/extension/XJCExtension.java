@@ -82,6 +82,7 @@ public class XJCExtension {
             private List<File> bindingFile=new ArrayList<>();
 
             private File outputDirectory;
+
             private String targetPackage;
 
             private String moduleName;

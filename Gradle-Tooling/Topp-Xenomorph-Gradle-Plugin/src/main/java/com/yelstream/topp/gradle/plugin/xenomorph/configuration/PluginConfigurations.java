@@ -1,15 +1,21 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.configuration;
 
+import com.yelstream.topp.gradle.api.ConfigurationDescriptor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Singular;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.plugins.JavaPluginExtension;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetContainer;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Plugin configurations.
@@ -55,18 +61,46 @@ public class PluginConfigurations {
     /**
      * Default dependencies for configuration {@link #JXC_CONFIGURATION_NAME}.
      */
-    public static final List<String> jxcDefaultDependencies =
+    public static final List<String> jxcDefaultDependencies=
         List.of("com.sun.xml.bind:jaxb-jxc:4.0.1");
+
+    public static final ConfigurationDescriptor XJC_CONFIGURATION_DESCRIPTOR=
+        ConfigurationDescriptor.of(XJC_CONFIGURATION_NAME,
+                                   name->String.format("JAXB dependencies for generation of sources from schema for source set '%s'.",name),
+                                   xjcDefaultDependencies);
+
+    public static final ConfigurationDescriptor JXC_CONFIGURATION_DESCRIPTOR=
+        ConfigurationDescriptor.of(JXC_CONFIGURATION_NAME,
+                                   name->String.format("JAXB dependencies for generation of schema from sources for source set '%s'.",name),
+                                   jxcDefaultDependencies);
 
     /**
      * Registered provider of configuration named {@link #XJC_CONFIGURATION_NAME}.
      */
-    private final NamedDomainObjectProvider<Configuration> xjcConfigurationProvider;
+    @Singular
+    private final Map<String,NamedDomainObjectProvider<Configuration>> xjcConfigurationProviders;
 
     /**
      * Registered provider of configuration named {@link #JXC_CONFIGURATION_NAME}.
      */
-    private final NamedDomainObjectProvider<Configuration> jxcConfigurationProvider;
+    @Singular
+    private final Map<String,NamedDomainObjectProvider<Configuration>> jxcConfigurationProviders;
+
+    public NamedDomainObjectProvider<Configuration> getXjcConfigurationProvider(SourceSet sourceSet) {
+        return xjcConfigurationProviders.get(sourceSet.getName());
+    }
+
+    public NamedDomainObjectProvider<Configuration> getXjcConfigurationProvider(String sourceSetName) {
+        return xjcConfigurationProviders.get(sourceSetName);
+    }
+
+    public NamedDomainObjectProvider<Configuration> getJxcConfigurationProvider(SourceSet sourceSet) {
+        return jxcConfigurationProviders.get(sourceSet.getName());
+    }
+
+    public NamedDomainObjectProvider<Configuration> getJxcConfigurationProvider(String sourceSetName) {
+        return jxcConfigurationProviders.get(sourceSetName);
+    }
 
     /**
      * Registers all plugin configurations.
@@ -74,22 +108,12 @@ public class PluginConfigurations {
      * @return Plugin configurations.
      */
     public static PluginConfigurations register(Project project) {
-        ConfigurationContainer configurations=project.getConfigurations();
+        JavaPluginExtension javaPluginExtension=project.getExtensions().getByType(JavaPluginExtension.class);
+        SourceSetContainer sourceSets=javaPluginExtension.getSourceSets();
+
         Builder builder=builder();
-        builder.xjcConfigurationProvider(configurations.register(XJC_CONFIGURATION_NAME,configuration -> {
-            configuration.setVisible(false);
-            configuration.setCanBeConsumed(false);
-            configuration.setCanBeResolved(true);
-            configuration.setDescription("JAXB dependencies for generation of sources from schema.");
-            configuration.defaultDependencies(dependencySet->xjcDefaultDependencies.forEach(dependencyNotation->dependencySet.add(project.getDependencies().create(dependencyNotation))));
-        }));
-        builder.jxcConfigurationProvider(configurations.register(JXC_CONFIGURATION_NAME,configuration -> {
-            configuration.setVisible(false);
-            configuration.setCanBeConsumed(false);
-            configuration.setCanBeResolved(true);
-            configuration.setDescription("JAXB dependencies for generation of schema from sources.");
-            configuration.defaultDependencies(dependencySet->jxcDefaultDependencies.forEach(dependencyNotation->dependencySet.add(project.getDependencies().create(dependencyNotation))));
-        }));
+        builder.xjcConfigurationProviders(XJC_CONFIGURATION_DESCRIPTOR.register(project,sourceSets));
+        builder.jxcConfigurationProviders(JXC_CONFIGURATION_DESCRIPTOR.register(project,sourceSets));
         return builder.build();
     }
 }

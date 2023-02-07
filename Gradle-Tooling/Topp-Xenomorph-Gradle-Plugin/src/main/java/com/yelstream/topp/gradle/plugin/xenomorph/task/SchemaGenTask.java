@@ -99,7 +99,7 @@ public abstract class SchemaGenTask extends DefaultTask {
         setDescription(DESCRIPTION);
         setGroup(GROUP_NAME);
 
-        jxcDependencies=pluginContextSupplier.get().getPluginConfigurations().getJxcConfigurationProvider();
+        jxcDependencies=pluginContextSupplier.get().getPluginConfigurations().getJxcConfigurationProvider("jxc");
 
 /*
         inputSchemaFiles=getObjectFactory().fileCollection().from(Tasks.RESOURCES_DIRECTORY_NAME);
