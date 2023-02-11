@@ -1,8 +1,10 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
 import com.yelstream.topp.command.Status;
+import com.yelstream.topp.gradle.api.SourceSets;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtension;
+import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtensions;
 import com.yelstream.topp.gradle.plugin.xenomorph.tool.XJCUtility;
 import com.yelstream.topp.gradle.plugin.xenomorph.util.SchemaReference;
 import com.yelstream.topp.gradle.plugin.xenomorph.util.XenomorphPluginUtility;
@@ -24,6 +26,7 @@ import org.gradle.api.internal.file.FileOperations;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.plugins.ExtensionContainer;
+import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
@@ -99,7 +102,7 @@ public abstract class XJCTask extends DefaultTask {
                       TASK_OUTPUT_DIRECTORY_NAME,
                       "java/src");
 
-    private final Supplier<PluginContext> pluginContextSupplier;
+    private final PluginContext pluginContext;
 
     @Inject
     protected abstract FileOperations getFileOperations();
@@ -144,12 +147,15 @@ public abstract class XJCTask extends DefaultTask {
     @Setter(onMethod_={@Option(option="dry",description="Configures task invocation to process arguments without actually running.")})
     private Boolean optionDry;
 
+private String sourceSetName;
+
     @Inject
     @SuppressWarnings("java:S5993")
-    public XJCTask(Supplier<PluginContext> pluginContextSupplier,
+    public XJCTask(PluginContext pluginContext,
                    String configurationName,
-                   String sourceSetName) {
-        this.pluginContextSupplier=pluginContextSupplier;
+                   SourceSet sourceSet) {
+        this.pluginContext=pluginContext;
+this.sourceSetName=sourceSet.getName();
 
         setDescription(DESCRIPTION);
         setGroup(GROUP_NAME);
@@ -157,50 +163,32 @@ public abstract class XJCTask extends DefaultTask {
         Project project=getProject();
         File buildDir=project.getBuildDir();
 
-        xjcDependencies=pluginContextSupplier.get().getPluginConfigurations().getXjcConfigurations().getConfigurationProvider(sourceSetName);
+        xjcDependencies=pluginContext.getPluginConfigurations().getXjcConfigurations().getConfigurationProvider(sourceSetName);
 
-        inputSchemaFiles=getObjectFactory().fileCollection().from(RESOURCES_DIRECTORY_NAME);
-        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(OUTPUT_DIRECTORY_NAME));
+//        inputSchemaFiles=getObjectFactory().fileCollection().from(RESOURCES_DIRECTORY_NAME);
+
+{
+SourceDirectorySet x=sourceSet.getResources();
+        inputSchemaFiles=getObjectFactory().fileCollection().from(x.getSrcDirs());
+System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
+}
+//        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(OUTPUT_DIRECTORY_NAME));
+        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(String.format("xenomorph/%s/java/src",this.getName())));
+
+//File _dir=new File(buildDir,String.format("xenomorph/%s/java/src",this.getName()));
+//_dir.mkdirs();
+
 
 //        resourceLoaderContainer=new ResourceLoaderContainer(getProject(),pluginContextSupplier.get().getPluginConfigurations());
 //        schemaReferenceConfiguration=resourceLoaderContainer.getSchemaReferenceConfiguration();
 //        compileClassPathMainJavaFileCollection=resourceLoaderContainer.getCompileClassPathMainJavaFileCollection();
 
 
-        project.getPluginManager().withPlugin("java", appliedPlugin->{
-            JavaPluginExtension javaPluginExtension=project.getExtensions().getByType(JavaPluginExtension.class);
-            SourceSetContainer javaSourceSets=javaPluginExtension.getSourceSets();
-            SourceSet mainJavaSourceSet=javaSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
-javaSourceSets.forEach(x->System.out.println("XXX(2): "+x.getName()));
-
-            String dir=new File(buildDir,OUTPUT_DIRECTORY_NAME).toString();
-            mainJavaSourceSet.getJava().srcDir(dir);
-        });
-
-
-{
-    JavaPluginExtension javaPluginExtension=project.getExtensions().getByType(JavaPluginExtension.class);
-    SourceSetContainer javaSourceSets=javaPluginExtension.getSourceSets();
-
-    javaSourceSets.forEach(s->System.out.println("Sources-set name: "+s.getName()));
-
-    SourceSet mainJavaSourceSet=javaSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
-    SourceDirectorySet resources=mainJavaSourceSet.getResources();
-    System.out.println("XXX: resources="+resources);
-    System.out.println("XXX: dirs="+resources.getSrcDirs());
-
-    SourceSet mainJavaSourceSet2=javaSourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME);
-    SourceDirectorySet resources2=mainJavaSourceSet2.getResources();
-    System.out.println("XXX2: resources="+resources2);
-    System.out.println("XXX2: dirs="+resources2.getSrcDirs());
-
-    ExtensionContainer ex=mainJavaSourceSet.getExtensions();
-
-
-    XJCExtension x=(XJCExtension)javaPluginExtension.getSourceSets().getByName("main").getExtensions().getByName("xjc");
-    System.out.println("Lookup(2): "+x+", "+x.getRuns().size());
-
-}
+        {
+//            String dir=new File(buildDir,OUTPUT_DIRECTORY_NAME).toString();
+            File dir=new File(buildDir,String.format("xenomorph/%s/java/src",this.getName()));
+            SourceSets.addJavaSourceDirectory(sourceSet,dir);
+        }
     }
 
 
@@ -254,7 +242,11 @@ javaSourceSets.forEach(x->System.out.println("XXX(2): "+x.getName()));
                 XJCUtility.showHelp(System.out);
             }
 
-            XJCExtension extension=XJCExtension.get(project);
+            XJCExtensions.ExtensionGroup eg=pluginContext.getPluginExtensions().getXjcExtensions().getExtensions().get(sourceSetName);
+            XJCExtension extension=eg.getGlobalExtension();
+
+
+            //XJCExtension extension=XJCExtension.get(project);
             if (!extension.isEnable()) {
                 logger.info("Task internals is disabled!");
             } else {
@@ -266,8 +258,8 @@ javaSourceSets.forEach(x->System.out.println("XXX(2): "+x.getName()));
 
                 List<XJCExtension.Run> runs=extension.getRuns();
 
-                if (runs == null || runs.isEmpty()) {
-                    logger.warn("Nothing to do! To remove this warning, do disable this run.");
+                if (runs==null || runs.isEmpty()) {
+                    logger.debug("Nothing to do!");
                 } else {
 
                     int runIndex = 0;
@@ -334,7 +326,8 @@ javaSourceSets.forEach(x->System.out.println("XXX(2): "+x.getName()));
             }
 
             {  //TODO: DO SOMETHING ELSE IF DIR IS DECLARED!
-                Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
+//                Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
+                Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(String.format("xenomorph/%s/java/src",this.getName())));
                 args.add("-d");
                 args.add(generatedFilesDirectory.toAbsolutePath().toString());
             }

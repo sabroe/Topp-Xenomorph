@@ -3,8 +3,15 @@ package com.yelstream.topp.gradle.api;
 import com.yelstream.topp.lang.Strings;
 import lombok.AllArgsConstructor;
 import lombok.experimental.UtilityClass;
+import org.gradle.api.Action;
+import org.gradle.api.Project;
+import org.gradle.api.file.SourceDirectorySet;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetContainer;
 
+import java.io.File;
+import java.util.List;
 import java.util.function.BiFunction;
 
 /**
@@ -82,5 +89,22 @@ public class SourceSets {
                                String nameSuffix) {
             return nameMapper.apply(namePart,nameSuffix);
         }
+    }
+
+
+    public static void addJavaSourceDirectory(SourceSet sourceSet,
+                                              Object directory) {
+        modifyJavaSourceDirectories(sourceSet,sourceDirectories->sourceDirectories.srcDir(directory));
+    }
+
+    public static void addJavaSourceDirectories(SourceSet sourceSet,
+                                                List<Object> directories) {
+        modifyJavaSourceDirectories(sourceSet,sourceDirectories->directories.forEach(sourceDirectories::srcDir));
+    }
+
+    public static void modifyJavaSourceDirectories(SourceSet sourceSet,
+                                                   Action<SourceDirectorySet> action) {
+        SourceDirectorySet sourceDirectories=sourceSet.getJava();
+        action.execute(sourceDirectories);
     }
 }

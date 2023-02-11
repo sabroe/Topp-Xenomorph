@@ -31,6 +31,7 @@ public class XJCExtensions {
      */
     private final Project project;
 
+    @Getter
     @AllArgsConstructor
     public static class ExtensionGroup {
         private final XJCExtension globalExtension;
@@ -53,7 +54,7 @@ public class XJCExtensions {
     private static XJCExtension createGlobalExtension(Project project,
                                                       SourceSet sourceSet) {
         ExtensionContainer extensions=project.getExtensions();
-        String name=SourceSets.NameStrategy.ShortConvention.toString("xjc",sourceSet.getName());
+        String name=SourceSets.NameStrategy.ShortConvention.toString("xjc",SourceSets.toShortName(sourceSet));
         return extensions.create(name,XJCExtension.class,project);
     }
 

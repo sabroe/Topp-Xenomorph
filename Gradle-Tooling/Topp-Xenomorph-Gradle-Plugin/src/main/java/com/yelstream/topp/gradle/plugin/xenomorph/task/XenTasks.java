@@ -11,43 +11,43 @@ import org.gradle.api.tasks.SourceSet;
 import java.util.function.Supplier;
 
 /**
- * Plugin tasks.
+ *
  *
  * @author Morten Sabroe Mortenen
  * @version 1.0
- * @since 2023-01-14
+ * @since 2023-02-11
  */
 @Getter
-@AllArgsConstructor(access=AccessLevel.PRIVATE)
+@AllArgsConstructor(access= AccessLevel.PRIVATE)
 @Builder(builderClassName="Builder",toBuilder=true)
-public class PluginTasks {
+public class XenTasks {
+    /**
+     *
+     */
+    private final Project project;
 
+    /**
+     * Provider of task named {@link XenTask#TASK_NAME}.
+     */
+//    private final TaskProvider<XenTask> xenTaskProvider;
 
-    private final XenTasks xenTasks;
-
-    private final SchemaGenTasks schemaGenTasks;
-
-    private final XJCTasks xjcTasks;
 
 
     public void register(SourceSet sourceSet,
                          PluginContext context) {
-        xenTasks.register(sourceSet,context);
-        schemaGenTasks.register(sourceSet,context);
-        xjcTasks.register(sourceSet,context);
-
     }
+
+
 
     /**
      *
      */
-    public static PluginTasks of(Project project) {
+    public static XenTasks of(Project project) {
         Builder builder=builder();
-        builder.xenTasks(XenTasks.of(project));
-        builder.schemaGenTasks(SchemaGenTasks.of(project));
-        builder.xjcTasks(XJCTasks.of(project));
+        builder.project(project);
         return builder.build();
     }
+
 
 
 }

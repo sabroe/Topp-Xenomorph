@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.gradle.api.Project;
+import org.gradle.api.tasks.SourceSet;
 
 /**
  * Plugin context.
@@ -16,9 +18,8 @@ import lombok.Getter;
  * @since 2023-01-16
  */
 @Getter
-@AllArgsConstructor(access= AccessLevel.PRIVATE)
+@AllArgsConstructor(access=AccessLevel.PRIVATE)
 @Builder(builderClassName="Builder",toBuilder=true)
-
 public class PluginContext {
     /**
      * Plugin configurations.
@@ -34,4 +35,18 @@ public class PluginContext {
      * Plugin tasks.
      */
     private final PluginTasks pluginTasks;
+
+    public static PluginContext of(Project project) {
+        Builder builder=builder();
+        builder.pluginConfigurations(PluginConfigurations.of(project));
+        builder.pluginExtensions(PluginExtensions.of(project));
+        builder.pluginTasks(PluginTasks.of(project));
+        return builder.build();
+    }
+
+    public void register(SourceSet sourceSet) {
+        pluginConfigurations.register(sourceSet);
+        pluginExtensions.register(sourceSet);
+        pluginTasks.register(sourceSet,this);
+    }
 }

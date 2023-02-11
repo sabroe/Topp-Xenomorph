@@ -46,7 +46,7 @@ public abstract class XenTask extends DefaultTask {
     public static final String OUTPUT_DIRECTORY_NAME=String.format("%s/%s/%s",Tasks.PLUGIN_OUTPUT_DIRECTORY_NAME,Tasks.JSON_SCHEMA_DOMAIN_OUTPUT_DIRECTORY_NAME,TASK_OUTPUT_DIRECTORY_NAME);
 */
 
-    private final Supplier<PluginContext> pluginContextSupplier;
+    private final PluginContext pluginContext;
 
     @Inject
     protected abstract FileOperations getFileOperations();
@@ -86,8 +86,8 @@ public abstract class XenTask extends DefaultTask {
 */
 
     @Inject
-    public XenTask(Supplier<PluginContext> pluginContextSupplier) {
-        this.pluginContextSupplier=pluginContextSupplier;
+    public XenTask(PluginContext pluginContext) {
+        this.pluginContext=pluginContext;
 
         setDescription(DESCRIPTION);
         setGroup(GROUP_NAME);

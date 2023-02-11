@@ -12,6 +12,7 @@ import org.gradle.api.internal.file.FileOperations;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.Classpath;
+import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskExecutionException;
 
@@ -47,7 +48,7 @@ public abstract class SchemaGenTask extends DefaultTask {
     public static final String OUTPUT_DIRECTORY_NAME=String.format("%s/%s/%s",Tasks.PLUGIN_OUTPUT_DIRECTORY_NAME,Tasks.JSON_SCHEMA_DOMAIN_OUTPUT_DIRECTORY_NAME,TASK_OUTPUT_DIRECTORY_NAME);
 */
 
-    private final Supplier<PluginContext> pluginContextSupplier;
+    private final PluginContext pluginContext;
 
     @Inject
     protected abstract FileOperations getFileOperations();
@@ -91,15 +92,15 @@ public abstract class SchemaGenTask extends DefaultTask {
 */
 
     @Inject
-    public SchemaGenTask(Supplier<PluginContext> pluginContextSupplier,
+    public SchemaGenTask(PluginContext pluginContext,
                          String configurationName,
-                         String sourceSetName) {
-        this.pluginContextSupplier=pluginContextSupplier;
+                         SourceSet sourceSet) {
+        this.pluginContext=pluginContext;
 
         setDescription(DESCRIPTION);
         setGroup(GROUP_NAME);
 
-        jxcDependencies=pluginContextSupplier.get().getPluginConfigurations().getSchemaGenConfigurations().getConfigurationProvider("main");  //TODO: Fix name!
+        jxcDependencies=pluginContext.getPluginConfigurations().getSchemaGenConfigurations().getConfigurationProvider("main");  //TODO: Fix name!
 
 /*
         inputSchemaFiles=getObjectFactory().fileCollection().from(Tasks.RESOURCES_DIRECTORY_NAME);

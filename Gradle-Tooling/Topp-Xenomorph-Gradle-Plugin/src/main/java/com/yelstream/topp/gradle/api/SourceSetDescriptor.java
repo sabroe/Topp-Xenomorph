@@ -5,8 +5,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
+import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.TaskContainer;
+import org.gradle.api.tasks.TaskProvider;
 
 /**
  * Describes information associated with a named source-set.
@@ -81,5 +85,36 @@ public class SourceSetDescriptor {
             descriptor=builder.build();
         }
         return descriptor;
+    }
+
+    /**
+     * Declares dependencies to the known tasks.
+     * @param project Project.
+     * @param taskProvider Task provider.
+     */
+    public void declareTaskDependencyFromCompileJavaTask(Project project,
+                                                         TaskProvider<? extends Task> taskProvider) {
+        TaskContainer tasks=project.getTasks();
+        tasks.getByName(getCompileJavaTaskName()).dependsOn(taskProvider);
+        if (sourceSetName.equals(SourceSet.MAIN_SOURCE_SET_NAME)) {
+            tasks.getByName("sourcesJar").dependsOn(taskProvider);
+            tasks.getByName("javadoc").dependsOn(taskProvider);
+        }
+    }
+
+    /**
+     * Declares dependencies to the known tasks.
+     * @param project Project.
+     * @param sourceSet Source set.
+     * @param taskProvider Task provider.
+     */
+    public static void declareTaskDependencyFromCompileJavaTask(Project project,
+                                                                SourceSet sourceSet,
+                                                                TaskProvider<? extends Task> taskProvider) {
+        SourceSetDescriptor sourceSetDescriptor=SourceSetDescriptor.of(sourceSet);
+        if (sourceSetDescriptor==null) {
+            throw new IllegalStateException(String.format("Failure to create a source set descriptor; source set is %s!",sourceSet));
+        }
+        sourceSetDescriptor.declareTaskDependencyFromCompileJavaTask(project,taskProvider);
     }
 }
