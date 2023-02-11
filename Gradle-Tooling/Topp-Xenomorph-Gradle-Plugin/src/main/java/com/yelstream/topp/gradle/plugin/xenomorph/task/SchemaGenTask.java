@@ -7,13 +7,11 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.internal.file.FileOperations;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.Classpath;
-import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskExecutionException;
 
@@ -93,13 +91,15 @@ public abstract class SchemaGenTask extends DefaultTask {
 */
 
     @Inject
-    public SchemaGenTask(Supplier<PluginContext> pluginContextSupplier) {
+    public SchemaGenTask(Supplier<PluginContext> pluginContextSupplier,
+                         String configurationName,
+                         String sourceSetName) {
         this.pluginContextSupplier=pluginContextSupplier;
 
         setDescription(DESCRIPTION);
         setGroup(GROUP_NAME);
 
-        jxcDependencies=pluginContextSupplier.get().getPluginConfigurations().getJxcConfigurationProvider("jxc");
+        jxcDependencies=pluginContextSupplier.get().getPluginConfigurations().getSchemaGenConfigurations().getConfigurationProvider("main");  //TODO: Fix name!
 
 /*
         inputSchemaFiles=getObjectFactory().fileCollection().from(Tasks.RESOURCES_DIRECTORY_NAME);

@@ -32,7 +32,7 @@ sourceSets{
     }
 }
 
-xenomorph {
+//xenomorph {
     sourceSets {
         main {
             xjc {
@@ -62,9 +62,9 @@ xenomorph {
             }
         }
     }
-}
+//}
 
-xenomorph {
+//xenomorph {
     xjc {
         resource.defaultResourceDir = project.file('src/main/resources')
         run {
@@ -100,7 +100,7 @@ xenomorph {
             }
         }
     }
-}
+//}
 
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.24'

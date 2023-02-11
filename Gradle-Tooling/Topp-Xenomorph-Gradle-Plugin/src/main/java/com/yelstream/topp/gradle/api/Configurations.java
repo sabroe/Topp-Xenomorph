@@ -21,7 +21,7 @@ public class Configurations {
      */
     @AllArgsConstructor
     @SuppressWarnings("java:S115")
-    public enum NameStrategy {
+    public enum NameStrategy {  //TODO: Consider this; should it survive?
         /**
          * Configuration name is the configuration name part.
          */
@@ -47,8 +47,8 @@ public class Configurations {
          * @param sourceSet Source set relative to which configurations are used and hence named.
          * @return Configuration name.
          */
-        String toString(String configurationNamePart,
-                        SourceSet sourceSet) {
+        public String toString(String configurationNamePart,
+                               SourceSet sourceSet) {
             return nameMapper.apply(configurationNamePart,sourceSet);
         }
     }

@@ -1,24 +1,14 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.configuration;
 
-import com.yelstream.topp.gradle.api.ConfigurationDescriptor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Singular;
-import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.SourceSetContainer;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
- * Plugin configurations.
+ * Creates and holds Gradle configurations for all tasks.
  *
  * @author Morten Sabroe Mortenen
  * @version 1.0
@@ -42,78 +32,28 @@ public class PluginConfigurations {
      *     See https://eclipse-ee4j.github.io/jaxb-ri/ !
      */
 
-    /**
-     * Name of configuration to be used by task "xjc".
-     */
-    public static final String XJC_CONFIGURATION_NAME="xjc";
+    private final XJCConfigurations xjcConfigurations;
 
-    /**
-     * Name of configuration to be used by task "jxc".
-     */
-    public static final String JXC_CONFIGURATION_NAME="jxc";
-
-    /**
-     * Default dependencies for configuration {@link #XJC_CONFIGURATION_NAME}.
-     */
-    public static final List<String> xjcDefaultDependencies=
-        List.of("com.sun.xml.bind:jaxb-xjc:4.0.1");
-
-    /**
-     * Default dependencies for configuration {@link #JXC_CONFIGURATION_NAME}.
-     */
-    public static final List<String> jxcDefaultDependencies=
-        List.of("com.sun.xml.bind:jaxb-jxc:4.0.1");
-
-    public static final ConfigurationDescriptor XJC_CONFIGURATION_DESCRIPTOR=
-        ConfigurationDescriptor.of(XJC_CONFIGURATION_NAME,
-                                   name->String.format("JAXB dependencies for generation of sources from schema for source set '%s'.",name),
-                                   xjcDefaultDependencies);
-
-    public static final ConfigurationDescriptor JXC_CONFIGURATION_DESCRIPTOR=
-        ConfigurationDescriptor.of(JXC_CONFIGURATION_NAME,
-                                   name->String.format("JAXB dependencies for generation of schema from sources for source set '%s'.",name),
-                                   jxcDefaultDependencies);
-
-    /**
-     * Registered provider of configuration named {@link #XJC_CONFIGURATION_NAME}.
-     */
-    @Singular
-    private final Map<String,NamedDomainObjectProvider<Configuration>> xjcConfigurationProviders;
-
-    /**
-     * Registered provider of configuration named {@link #JXC_CONFIGURATION_NAME}.
-     */
-    @Singular
-    private final Map<String,NamedDomainObjectProvider<Configuration>> jxcConfigurationProviders;
-
-    public NamedDomainObjectProvider<Configuration> getXjcConfigurationProvider(SourceSet sourceSet) {
-        return xjcConfigurationProviders.get(sourceSet.getName());
-    }
-
-    public NamedDomainObjectProvider<Configuration> getXjcConfigurationProvider(String sourceSetName) {
-        return xjcConfigurationProviders.get(sourceSetName);
-    }
-
-    public NamedDomainObjectProvider<Configuration> getJxcConfigurationProvider(SourceSet sourceSet) {
-        return jxcConfigurationProviders.get(sourceSet.getName());
-    }
-
-    public NamedDomainObjectProvider<Configuration> getJxcConfigurationProvider(String sourceSetName) {
-        return jxcConfigurationProviders.get(sourceSetName);
-    }
+    private final SchemaGenConfigurations schemaGenConfigurations;
 
     /**
      * Registers all plugin configurations.
      * @param project Project.
      * @return Plugin configurations.
      */
-    public static PluginConfigurations register(Project project) {
-        JavaPluginExtension javaPluginExtension=project.getExtensions().getByType(JavaPluginExtension.class);
-        SourceSetContainer sourceSets=javaPluginExtension.getSourceSets();
-
+    public static PluginConfigurations of(Project project) {
         Builder builder=builder();
-        builder.xjcConfigurationProviders(XJC_CONFIGURATION_DESCRIPTOR.register(project,sourceSets));
-        builder.jxcConfigurationProviders(JXC_CONFIGURATION_DESCRIPTOR.register(project,sourceSets));
+        builder.xjcConfigurations(XJCConfigurations.of(project));
+        builder.schemaGenConfigurations(SchemaGenConfigurations.of(project));
         return builder.build();
+    }
+
+    /**
+     * Registers all plugin configurations.
+     * @return Plugin configurations.
+     */
+    public void register(SourceSet sourceSet) {
+        xjcConfigurations.register(sourceSet);
+        schemaGenConfigurations.register(sourceSet);
     }
 }

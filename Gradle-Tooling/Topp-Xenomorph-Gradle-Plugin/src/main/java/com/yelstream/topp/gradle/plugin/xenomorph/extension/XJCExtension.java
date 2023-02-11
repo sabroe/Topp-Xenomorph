@@ -4,11 +4,9 @@ import com.yelstream.topp.gradle.api.ResourceFactory;
 import com.yelstream.topp.gradle.plugin.xenomorph.util.SchemaReference;
 import com.yelstream.topp.gradle.plugin.xenomorph.util.SchemaReferenceFactory;
 import groovy.lang.Closure;
-import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.tasks.SourceSet;
@@ -18,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Gradle extension linked to usages of task {@link com.yelstream.topp.gradle.plugin.xenomorph.task.XJCTask}.
  *
  * @author Morten Sabroe Mortenen
  * @version 1.0

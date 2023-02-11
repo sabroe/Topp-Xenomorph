@@ -4,6 +4,7 @@ import com.yelstream.topp.lang.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.SourceSet;
 
@@ -14,6 +15,7 @@ import org.gradle.api.tasks.SourceSet;
  * @version 1.0
  * @since 2023-02-07
  */
+@ToString
 @Getter
 @AllArgsConstructor(access=AccessLevel.PRIVATE)
 @lombok.Builder(builderClassName="Builder",toBuilder=false)

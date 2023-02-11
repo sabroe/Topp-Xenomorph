@@ -1,7 +1,6 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
 import com.yelstream.topp.command.Status;
-import com.yelstream.topp.gradle.plugin.xenomorph.XenomorphPlugin;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtension;
 import com.yelstream.topp.gradle.plugin.xenomorph.tool.XJCUtility;
@@ -13,9 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
-import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -23,13 +20,10 @@ import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.file.SourceDirectorySet;
-import org.gradle.api.internal.AbstractNamedDomainObjectContainer;
 import org.gradle.api.internal.file.FileOperations;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.ExtensionContainer;
-import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
@@ -152,7 +146,9 @@ public abstract class XJCTask extends DefaultTask {
 
     @Inject
     @SuppressWarnings("java:S5993")
-    public XJCTask(Supplier<PluginContext> pluginContextSupplier) {
+    public XJCTask(Supplier<PluginContext> pluginContextSupplier,
+                   String configurationName,
+                   String sourceSetName) {
         this.pluginContextSupplier=pluginContextSupplier;
 
         setDescription(DESCRIPTION);
@@ -161,7 +157,7 @@ public abstract class XJCTask extends DefaultTask {
         Project project=getProject();
         File buildDir=project.getBuildDir();
 
-        xjcDependencies=pluginContextSupplier.get().getPluginConfigurations().getXjcConfigurationProvider("xjc");  //NOTE: CONFIGURATION HERE!
+        xjcDependencies=pluginContextSupplier.get().getPluginConfigurations().getXjcConfigurations().getConfigurationProvider(sourceSetName);
 
         inputSchemaFiles=getObjectFactory().fileCollection().from(RESOURCES_DIRECTORY_NAME);
         outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(OUTPUT_DIRECTORY_NAME));

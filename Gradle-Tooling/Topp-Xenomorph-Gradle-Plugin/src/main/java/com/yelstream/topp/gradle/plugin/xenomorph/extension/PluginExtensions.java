@@ -4,10 +4,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import org.gradle.api.Project;
-import org.gradle.api.plugins.ExtensionContainer;
+import org.gradle.api.tasks.SourceSet;
 
 /**
- * Plugin extensions.
+ * Creates and holds Gradle extensions.
  *
  * @author Morten Sabroe Mortenen
  * @version 1.0
@@ -17,22 +17,35 @@ import org.gradle.api.plugins.ExtensionContainer;
 @Builder(builderClassName="Builder",toBuilder=true)
 public class PluginExtensions {
 
-    private final XenomorphExtension xenomorphExtension;
+    /**
+     *
+     */
+    private final XenomorphExtensions xenomorphExtensions;
 
-    private final XJCExtension xjcExtension;
+    /**
+     *
+     */
+    private final XJCExtensions xjcExtensions;
 
-    private final SchemaGenExtension schemaGenExtension;
+    /**
+     *
+     */
+    private final SchemaGenExtensions schemaGenExtensions;
 
-    public static PluginExtensions register(Project project) {
-        ExtensionContainer extensions=project.getExtensions();
-        return register(extensions);
+    public void register(SourceSet sourceSet) {
+        xenomorphExtensions.register(sourceSet);
+        xjcExtensions.register(sourceSet);
+        schemaGenExtensions.register(sourceSet);
     }
 
-    public static PluginExtensions register(ExtensionContainer extensions) {
+    /**
+     *
+     */
+    public static PluginExtensions of(Project project) {
         Builder builder=builder();
-        builder.xjcExtension(extensions.create(XJCExtension.EXTENSION_NAME,XJCExtension.class));
-        builder.schemaGenExtension(extensions.create(SchemaGenExtension.EXTENSION_NAME,SchemaGenExtension.class));
-        builder.xenomorphExtension(extensions.create(XenomorphExtension.EXTENSION_NAME,XenomorphExtension.class));  //Yes, create this last!
+        builder.xenomorphExtensions(XenomorphExtensions.of(project));
+        builder.xjcExtensions(XJCExtensions.of(project));
+        builder.schemaGenExtensions(SchemaGenExtensions.of(project));
         return builder.build();
     }
 }

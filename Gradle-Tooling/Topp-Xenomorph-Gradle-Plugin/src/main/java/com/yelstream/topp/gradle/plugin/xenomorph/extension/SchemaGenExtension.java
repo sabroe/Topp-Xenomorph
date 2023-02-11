@@ -1,12 +1,15 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.extension;
 
+import com.yelstream.topp.gradle.api.ResourceFactory;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionContainer;
+import org.gradle.api.tasks.SourceSet;
 
 /**
- *
+ * Gradle extension linked to usages of task {@link com.yelstream.topp.gradle.plugin.xenomorph.task.SchemaGenTask}.
  *
  * @author Morten Sabroe Mortenen
  * @version 1.0
@@ -20,10 +23,21 @@ public class SchemaGenExtension {
      */
     public static final String EXTENSION_NAME="schemaGen";
 
-    public static SchemaGenExtension get(Project project) {
-        ExtensionContainer extension=project.getExtensions();
-        return (SchemaGenExtension)extension.getByName(EXTENSION_NAME);
+
+    public SchemaGenExtension(Project project) {
+        this.project=project;
+        resource=ResourceFactory.of(project);
+    }
+
+    public SchemaGenExtension(Project project,
+                              SourceSet sourceSet) {
+        this.project=project;
+        resource=ResourceFactory.of(project,sourceSet);
     }
 
     private final Project project;
+
+
+    @Getter
+    private final ResourceFactory resource;
 }

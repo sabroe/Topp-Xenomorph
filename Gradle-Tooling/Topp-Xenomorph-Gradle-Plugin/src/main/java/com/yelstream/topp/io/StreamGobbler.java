@@ -39,11 +39,21 @@ public class StreamGobbler implements Runnable, AutoCloseable {
      */
     private final Consumer<String> consumer;
 
-    @Override
-    public void run() {
+    /**
+     * Consumes all lines
+     * @throws IOException Thrown in case of I/O error.
+     */
+    public void consumeAll() throws IOException {
         try (Reader reader=new InputStreamReader(inputStream, charset);
              BufferedReader bufferedReader=new BufferedReader(reader)) {
             bufferedReader.lines().forEach(consumer);
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            consumeAll();
         } catch (IOException ex) {
             throw new IllegalStateException("Failure to gobble lines from input stream!",ex);
         }

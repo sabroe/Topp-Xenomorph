@@ -1,12 +1,11 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.extension;
 
-import com.yelstream.topp.gradle.api.ResourceFactory;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.gradle.api.Project;
 
 /**
- *
+ * Gradle extension linked to usages of plugin.
  *
  * @author Morten Sabroe Mortenen
  * @version 1.0
@@ -20,16 +19,22 @@ public class XenomorphExtension {
 
     public XenomorphExtension(Project project) {
         this.project=project;
+/*
         xjc=XJCExtension.get(project);
         schemaGen=SchemaGenExtension.get(project);
+*/
     }
 
     @Getter(AccessLevel.PROTECTED)
     private final Project project;
 
+/*
     @Getter
     private final XJCExtension xjc;
+*/
 
+/*
     @Getter
     private final SchemaGenExtension schemaGen;
+*/
 }
