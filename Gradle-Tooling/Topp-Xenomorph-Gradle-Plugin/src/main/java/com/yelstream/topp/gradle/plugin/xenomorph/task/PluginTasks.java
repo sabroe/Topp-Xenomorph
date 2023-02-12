@@ -1,6 +1,8 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
+import com.yelstream.topp.gradle.plugin.xenomorph.configuration.PluginConfigurations;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
+import com.yelstream.topp.gradle.plugin.xenomorph.extension.PluginExtensions;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,12 +32,12 @@ public class PluginTasks {
     private final XJCTasks xjcTasks;
 
 
-    public void register(SourceSet sourceSet,
-                         PluginContext context) {
-        xenTasks.register(sourceSet,context);
-        schemaGenTasks.register(sourceSet,context);
-        xjcTasks.register(sourceSet,context);
-
+    public void register(PluginConfigurations pluginConfigurations,
+                         PluginExtensions pluginExtensions,
+                         SourceSet sourceSet) {
+        xenTasks.register(pluginConfigurations,pluginExtensions,sourceSet);
+        schemaGenTasks.register(pluginConfigurations,pluginExtensions,sourceSet);
+        xjcTasks.register(pluginConfigurations,pluginExtensions,sourceSet);
     }
 
     /**

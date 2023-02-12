@@ -47,6 +47,6 @@ public class PluginContext {
     public void register(SourceSet sourceSet) {
         pluginConfigurations.register(sourceSet);
         pluginExtensions.register(sourceSet);
-        pluginTasks.register(sourceSet,this);
+        pluginTasks.register(pluginConfigurations,pluginExtensions,sourceSet);
     }
 }

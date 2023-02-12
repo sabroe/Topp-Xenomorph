@@ -1,6 +1,8 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
+import com.yelstream.topp.gradle.plugin.xenomorph.configuration.PluginConfigurations;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
+import com.yelstream.topp.gradle.plugin.xenomorph.extension.PluginExtensions;
 import com.yelstream.topp.grind.gradle.api.Tasks;
 import lombok.Getter;
 import org.gradle.api.DefaultTask;
@@ -48,7 +50,11 @@ public abstract class SchemaGenTask extends DefaultTask {
     public static final String OUTPUT_DIRECTORY_NAME=String.format("%s/%s/%s",Tasks.PLUGIN_OUTPUT_DIRECTORY_NAME,Tasks.JSON_SCHEMA_DOMAIN_OUTPUT_DIRECTORY_NAME,TASK_OUTPUT_DIRECTORY_NAME);
 */
 
-    private final PluginContext pluginContext;
+    private final PluginConfigurations pluginConfigurations;
+
+    private final PluginExtensions pluginExtensions;
+
+    private final SourceSet sourceSet;
 
     @Inject
     protected abstract FileOperations getFileOperations();
@@ -92,15 +98,17 @@ public abstract class SchemaGenTask extends DefaultTask {
 */
 
     @Inject
-    public SchemaGenTask(PluginContext pluginContext,
-                         String configurationName,
+    public SchemaGenTask(PluginConfigurations pluginConfigurations,
+                         PluginExtensions pluginExtensions,
                          SourceSet sourceSet) {
-        this.pluginContext=pluginContext;
+        this.pluginConfigurations=pluginConfigurations;
+        this.pluginExtensions=pluginExtensions;
+        this.sourceSet=sourceSet;
 
         setDescription(DESCRIPTION);
         setGroup(GROUP_NAME);
 
-        jxcDependencies=pluginContext.getPluginConfigurations().getSchemaGenConfigurations().getConfigurationProvider("main");  //TODO: Fix name!
+        jxcDependencies=pluginConfigurations.getSchemaGenConfigurations().getConfigurationProvider("main");  //TODO: Fix name!
 
 /*
         inputSchemaFiles=getObjectFactory().fileCollection().from(Tasks.RESOURCES_DIRECTORY_NAME);

@@ -2,7 +2,9 @@ package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
 import com.yelstream.topp.command.Status;
 import com.yelstream.topp.gradle.api.SourceSets;
+import com.yelstream.topp.gradle.plugin.xenomorph.configuration.PluginConfigurations;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
+import com.yelstream.topp.gradle.plugin.xenomorph.extension.PluginExtensions;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtension;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtensions;
 import com.yelstream.topp.gradle.plugin.xenomorph.tool.XJCUtility;
@@ -25,16 +27,12 @@ import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.internal.file.FileOperations;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.plugins.ExtensionContainer;
-import org.gradle.api.plugins.JavaPlugin;
-import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskExecutionException;
 import org.gradle.api.tasks.options.Option;
@@ -47,7 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  *
@@ -102,7 +99,11 @@ public abstract class XJCTask extends DefaultTask {
                       TASK_OUTPUT_DIRECTORY_NAME,
                       "java/src");
 
-    private final PluginContext pluginContext;
+    private final PluginConfigurations pluginConfigurations;
+
+    private final PluginExtensions pluginExtensions;
+
+    private final SourceSet sourceSet;
 
     @Inject
     protected abstract FileOperations getFileOperations();
@@ -147,15 +148,14 @@ public abstract class XJCTask extends DefaultTask {
     @Setter(onMethod_={@Option(option="dry",description="Configures task invocation to process arguments without actually running.")})
     private Boolean optionDry;
 
-private String sourceSetName;
-
     @Inject
     @SuppressWarnings("java:S5993")
-    public XJCTask(PluginContext pluginContext,
-                   String configurationName,
+    public XJCTask(PluginConfigurations pluginConfigurations,
+                   PluginExtensions pluginExtensions,
                    SourceSet sourceSet) {
-        this.pluginContext=pluginContext;
-this.sourceSetName=sourceSet.getName();
+        this.pluginConfigurations=pluginConfigurations;
+        this.pluginExtensions=pluginExtensions;
+        this.sourceSet=sourceSet;
 
         setDescription(DESCRIPTION);
         setGroup(GROUP_NAME);
@@ -163,7 +163,7 @@ this.sourceSetName=sourceSet.getName();
         Project project=getProject();
         File buildDir=project.getBuildDir();
 
-        xjcDependencies=pluginContext.getPluginConfigurations().getXjcConfigurations().getConfigurationProvider(sourceSetName);
+        xjcDependencies=pluginConfigurations.getXjcConfigurations().getConfigurationProvider(sourceSet.getName());
 
 //        inputSchemaFiles=getObjectFactory().fileCollection().from(RESOURCES_DIRECTORY_NAME);
 
@@ -242,7 +242,7 @@ System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
                 XJCUtility.showHelp(System.out);
             }
 
-            XJCExtensions.ExtensionGroup eg=pluginContext.getPluginExtensions().getXjcExtensions().getExtensions().get(sourceSetName);
+            XJCExtensions.ExtensionGroup eg=pluginExtensions.getXjcExtensions().getExtensions().get(sourceSet.getName());
             XJCExtension extension=eg.getGlobalExtension();
 
 

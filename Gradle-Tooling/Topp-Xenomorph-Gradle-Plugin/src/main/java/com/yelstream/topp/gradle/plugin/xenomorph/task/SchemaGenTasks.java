@@ -2,7 +2,9 @@ package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
 import com.yelstream.topp.gradle.api.Configurations;
 import com.yelstream.topp.gradle.api.SourceSetDescriptor;
+import com.yelstream.topp.gradle.plugin.xenomorph.configuration.PluginConfigurations;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
+import com.yelstream.topp.gradle.plugin.xenomorph.extension.PluginExtensions;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,16 +41,16 @@ public class SchemaGenTasks {
 
 
 
-    public void register(SourceSet sourceSet,
-                         PluginContext context) {
+
+    public void register(PluginConfigurations pluginConfigurations,
+                         PluginExtensions pluginExtensions,
+                         SourceSet sourceSet) {
         TaskContainer tasks= project.getTasks();
         String taskName= Configurations.NameStrategy.ShortConvention.toString(SchemaGenTask.TASK_NAME,sourceSet);
-        String configurationName=taskName;
-        TaskProvider<SchemaGenTask> taskProvider=tasks.register(taskName,SchemaGenTask.class,context,configurationName,sourceSet);
+        TaskProvider<SchemaGenTask> taskProvider=tasks.register(taskName,SchemaGenTask.class,pluginConfigurations,pluginExtensions,sourceSet);
         SourceSetDescriptor.declareTaskDependencyFromCompileJavaTask(project,sourceSet,taskProvider);
         schemaGenTaskProviders.put(sourceSet.getName(),taskProvider);
     }
-
 
     /**
      *

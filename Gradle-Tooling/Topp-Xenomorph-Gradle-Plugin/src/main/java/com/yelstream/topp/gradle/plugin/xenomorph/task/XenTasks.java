@@ -1,6 +1,8 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.task;
 
+import com.yelstream.topp.gradle.plugin.xenomorph.configuration.PluginConfigurations;
 import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
+import com.yelstream.topp.gradle.plugin.xenomorph.extension.PluginExtensions;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,8 +35,9 @@ public class XenTasks {
 
 
 
-    public void register(SourceSet sourceSet,
-                         PluginContext context) {
+    public void register(PluginConfigurations pluginConfigurations,
+                         PluginExtensions pluginExtensions,
+                         SourceSet sourceSet) {
     }
 
 
