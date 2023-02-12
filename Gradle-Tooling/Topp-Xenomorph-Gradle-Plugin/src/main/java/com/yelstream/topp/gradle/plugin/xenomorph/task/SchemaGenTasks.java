@@ -3,7 +3,6 @@ package com.yelstream.topp.gradle.plugin.xenomorph.task;
 import com.yelstream.topp.gradle.api.Configurations;
 import com.yelstream.topp.gradle.api.SourceSetDescriptor;
 import com.yelstream.topp.gradle.plugin.xenomorph.configuration.PluginConfigurations;
-import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.PluginExtensions;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,10 +36,7 @@ public class SchemaGenTasks {
      * Provider of task named {@link SchemaGenTask#TASK_NAME}.
      * Elements are (<source-set-name>,<task-provider>).
      */
-    private final Map<String, TaskProvider<SchemaGenTask>> schemaGenTaskProviders=new HashMap<>();
-
-
-
+    private final Map<String,TaskProvider<SchemaGenTask>> schemaGenTaskProviders=new HashMap<>();
 
     public void register(PluginConfigurations pluginConfigurations,
                          PluginExtensions pluginExtensions,

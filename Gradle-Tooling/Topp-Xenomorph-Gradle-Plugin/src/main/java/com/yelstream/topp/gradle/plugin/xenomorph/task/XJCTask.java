@@ -173,7 +173,8 @@ SourceDirectorySet x=sourceSet.getResources();
 System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
 }
 //        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(OUTPUT_DIRECTORY_NAME));
-        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(String.format("xenomorph/%s/java/src",this.getName())));
+//        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(String.format("xenomorph/%s/java/src",this.getName())));
+        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(String.format("xenomorph/%s",this.getName())));
 
 //File _dir=new File(buildDir,String.format("xenomorph/%s/java/src",this.getName()));
 //_dir.mkdirs();
@@ -184,11 +185,13 @@ System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
 //        compileClassPathMainJavaFileCollection=resourceLoaderContainer.getCompileClassPathMainJavaFileCollection();
 
 
+/*
         {
 //            String dir=new File(buildDir,OUTPUT_DIRECTORY_NAME).toString();
             File dir=new File(buildDir,String.format("xenomorph/%s/java/src",this.getName()));
             SourceSets.addJavaSourceDirectory(sourceSet,dir);
         }
+*/
     }
 
 
@@ -282,10 +285,18 @@ System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
 
 /*
     DGML
-    GraphML
+         http://schemas.microsoft.com/vs/2009/dgml
+         https://learn.microsoft.com/en-us/visualstudio/modeling/directed-graph-markup-language-dgml-reference?view=vs-2022
     XGMML
+         https://www.reviversoft.com/en/file-extensions/xgmml
+         https://en.wikipedia.org/wiki/XGMML
     PhyloXML
+         http://www.phyloxml.org/
+         https://en.wikipedia.org/wiki/PhyloXML
     NeXML
+         http://etetoolkit.org/docs/latest/tutorial/tutorial_nexml.html
+         https://en.wikipedia.org/wiki/NeXML_format
+         http://nexml.org/
 */
 
     private void executeRun(RunContext runContext) throws Exception {
@@ -327,9 +338,16 @@ System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
 
             {  //TODO: DO SOMETHING ELSE IF DIR IS DECLARED!
 //                Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
-                Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(String.format("xenomorph/%s/java/src",this.getName())));
+                Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(String.format("xenomorph/%s/run/%d/java/src",this.getName(),index)));
                 args.add("-d");
                 args.add(generatedFilesDirectory.toAbsolutePath().toString());
+
+{
+    File dir=new File(buildDir,String.format("xenomorph/%s/run/%d/java/src",this.getName(),index));
+dir.mkdirs();
+    SourceSets.addJavaSourceDirectory(sourceSet,dir);
+//System.out.println(sourceSet.getAllJava().getSrcDirs());
+}
             }
 
             {

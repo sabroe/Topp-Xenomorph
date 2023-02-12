@@ -33,14 +33,10 @@ public class XenTasks {
      */
 //    private final TaskProvider<XenTask> xenTaskProvider;
 
-
-
     public void register(PluginConfigurations pluginConfigurations,
                          PluginExtensions pluginExtensions,
                          SourceSet sourceSet) {
     }
-
-
 
     /**
      *
@@ -50,7 +46,4 @@ public class XenTasks {
         builder.project(project);
         return builder.build();
     }
-
-
-
 }
