@@ -162,6 +162,9 @@ public class ResourceFactory {
                 Logger logger=resourceFactory.getLogger();
                 LogLevel level=resourceFactory.level;
                 File resourceDirectory=resourceFactory.getDefaultResourceDir();
+
+                //TODO: Resolve according to main source-set!
+
                 if (resourceDirectory!=null) {
                     File candicateFile=new File(resourceDirectory,file.getPath());
                     if (logger.isEnabled(level)) {
@@ -461,6 +464,7 @@ public class ResourceFactory {
         builder.project(project);
         builder.resolver(ResourceFactory.DefaultResourceDirectoryResolver.of());
         builder.resolver(ResourceFactory.SourceSetResolver.of(sourceSet));
+        builder.resolver(ResourceFactory.ProjectResolver.of(project));
         builder.failOnUnresolved(false);
         return builder.build();
     }

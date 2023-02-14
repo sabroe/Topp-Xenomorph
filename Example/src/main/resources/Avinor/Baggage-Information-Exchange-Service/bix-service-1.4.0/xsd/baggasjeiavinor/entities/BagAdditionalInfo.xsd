@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../../basictypes/BagCategory.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagAdditionalInfoCode.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagTagNumber.xsd"/>
+
+    <xs:complexType name="BagAdditionalInfo">
+        <xs:sequence>
+            <xs:element name="bagCategory" type="BagCategory" minOccurs="0"/>
+            <xs:element name="bagIsPrio" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="bagIsRush" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="bagIsCrew" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="bagCanBeLoaded" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="bagCanBeTransported" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="bagAdditionalInfoCode" type="BagAdditionalInfoCode" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="bagNewTagNumber" type="BagTagNumber" minOccurs="0"/>
+            <xs:element name="bagPreviousTagNumber" type="BagTagNumber" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

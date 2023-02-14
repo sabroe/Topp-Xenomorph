@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../../basictypes/AirlineIATA.xsd"/>
+    <xs:include schemaLocation="../../basictypes/AirportIATA.xsd"/>
+    <xs:include schemaLocation="../../basictypes/FlightId.xsd"/>
+    <xs:include schemaLocation="../../basictypes/DateTimeUTC.xsd"/>
+    <xs:include schemaLocation="../../basictypes/DateUTC.xsd"/>
+
+    <xs:complexType name="BagSegmentData">
+        <xs:sequence>
+            <xs:element name="operatingAirlineIATA" type="AirlineIATA" minOccurs="0"/>
+            <xs:element name="flightId" type="FlightId" minOccurs="0"/>
+            <xs:element name="flightDepartureDate" type="DateUTC" minOccurs="0"/>
+            <xs:element name="SOBT" type="DateTimeUTC" minOccurs="0"/>
+            <xs:element name="departureAirportIATA" type="AirportIATA" minOccurs="0"/>
+            <xs:element name="SIBT" type="DateTimeUTC" minOccurs="0"/>
+            <xs:element name="arrivalAirportIATA" type="AirportIATA" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

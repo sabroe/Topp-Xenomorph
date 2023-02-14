@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../../entities/FlightLegIdentifier.xsd"/>
+    <xs:include schemaLocation="../../basictypes/Count.xsd"/>
+
+    <xs:complexType name="BagFlightDepartureTransferStateData">
+        <xs:sequence>
+            <xs:element name="arrivalFlightLegIdentifier" type="FlightLegIdentifier"/>
+            <xs:element name="bagTagGeneratedNet" type="Count" minOccurs="0" />
+            <xs:element name="bagsActive" type="Count" minOccurs="0" />
+            <xs:element name="bagCanBeLoadedCount" type="Count" minOccurs="0" />
+            <xs:element name="bagLoadedInContainerCount" type="Count" minOccurs="0" />
+            <xs:element name="bagLoadedInAircraftCount" type="Count" minOccurs="0" />
+            <xs:element name="bagsLoaded" type="Count" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

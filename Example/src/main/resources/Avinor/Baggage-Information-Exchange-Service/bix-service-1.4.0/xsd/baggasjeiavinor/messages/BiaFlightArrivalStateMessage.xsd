@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns="http://www.avinor.no/bia/1.0/BiaFlightArrivalStateMessage"
+           targetNamespace="http://www.avinor.no/bia/1.0/BiaFlightArrivalStateMessage"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           version="1.0.0">
+
+    <xs:include schemaLocation="../metadata/AmbiHeader.xsd" />
+    <xs:include schemaLocation="../entities/BagFlightArrivalStateData.xsd" />
+
+    <xs:element name="BiaFlightArrivalStateMessage">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ambiHeader" type="AmbiHeader" />
+                <xs:element name="bagFlightArrivalState" type="BagFlightArrivalStateData" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

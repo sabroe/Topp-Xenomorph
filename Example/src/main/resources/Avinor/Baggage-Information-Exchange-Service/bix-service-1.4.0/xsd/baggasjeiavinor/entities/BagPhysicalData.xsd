@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../../basictypes/BagTypeIndicator.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagSizeIndicator.xsd"/>
+    <xs:include schemaLocation="../../basictypes/Kilo.xsd"/>
+    <xs:include schemaLocation="../../basictypes/Centimeter.xsd"/>
+    <xs:include schemaLocation="BagImage.xsd"/>
+
+    <xs:complexType name="BagPhysicalData">
+        <xs:sequence>
+            <xs:element name="bagTypeIndicator" type="BagTypeIndicator" minOccurs="0"/>
+            <xs:element name="bagSizeIndicator" type="BagSizeIndicator" minOccurs="0"/>
+            <xs:element name="bagWeight" type="Kilo" minOccurs="0"/>
+            <xs:element name="bagLength" type="Centimeter" minOccurs="0"/>
+            <xs:element name="bagWidth" type="Centimeter" minOccurs="0"/>
+            <xs:element name="bagHeight" type="Centimeter" minOccurs="0"/>
+            <xs:element name="bagImage" type="BagImage" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

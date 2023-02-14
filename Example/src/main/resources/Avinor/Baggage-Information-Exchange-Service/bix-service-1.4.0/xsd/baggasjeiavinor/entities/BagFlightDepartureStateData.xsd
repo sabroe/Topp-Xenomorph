@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../entities/BagFlightDepartureTransferStateData.xsd"/>
+    <xs:include schemaLocation="../entities/BagFlightDepartureBhsBinStateData.xsd"/>
+    <xs:include schemaLocation="../../entities/FlightLegIdentifier.xsd"/>
+    <xs:include schemaLocation="../../basictypes/Count.xsd"/>
+    <xs:include schemaLocation="../../basictypes/DateTimeUTC.xsd"/>
+
+    <xs:complexType name="BagFlightDepartureStateData">
+        <xs:sequence>
+            <xs:element name="departureFlightLegIdentifier" type="FlightLegIdentifier"/>
+            <xs:element name="SOBT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="bagTagsGenerated" type="Count" minOccurs="0" />
+            <xs:element name="bagTagsGeneratedLocal" type="Count" minOccurs="0" />
+            <xs:element name="bagTagsGeneratedNet" type="Count" minOccurs="0" />
+            <xs:element name="bagTagsActive" type="Count" minOccurs="0" />
+            <xs:element name="bagsCheckedIn" type="Count" minOccurs="0" />
+            <xs:element name="bagsFromLocal" type="Count" minOccurs="0" />
+            <xs:element name="bagsFromTransfer" type="Count" minOccurs="0" />
+            <xs:element name="bagsSeenInBHS" type="Count" minOccurs="0" />
+            <xs:element name="bagsDeliveredToBhsFlightBin" type="Count" minOccurs="0" />
+            <xs:element name="bagsDeliveredToBhsProblemBin" type="Count" minOccurs="0" />
+            <xs:element name="bagCanBeLoadedCount" type="Count" minOccurs="0" />
+            <xs:element name="bagCanBeTransportedCount" type="Count" minOccurs="0" />
+            <xs:element name="baggageCountLoaded" type="Count" minOccurs="0" />
+            <xs:element name="bagLoadedInContainerCount" type="Count" minOccurs="0" />
+            <xs:element name="bagLoadedInAircraftCount" type="Count" minOccurs="0" />
+            <xs:element name="bagNonConveyableCount" type="Count" minOccurs="0" />
+            <xs:element name="bagOversizeCount" type="Count" minOccurs="0" />
+            <xs:element name="bagFlightDepartureTransferState" type="BagFlightDepartureTransferStateData" minOccurs="0" maxOccurs="unbounded"  />
+            <xs:element name="bagFlightDepartureBhsBinStateData" type="BagFlightDepartureBhsBinStateData" minOccurs="0" maxOccurs="unbounded"  />
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

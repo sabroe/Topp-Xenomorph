@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <simpleType name="Event">
+        <restriction base="string">
+            <maxLength value="16"/>
+        </restriction>
+    </simpleType>
+
+</schema>

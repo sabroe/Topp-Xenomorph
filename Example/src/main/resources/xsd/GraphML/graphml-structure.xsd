@@ -17,7 +17,7 @@
         xml:lang="en">
      The schema corresponding to this document defines the structural
      layer of the Graph Markup Language (GraphML).
-     Although a DTD is provided, this schema is, together with its extensions
+     Although a DTD is provided, this schema is, together with its extension
      http://graphml.graphdrawing.org/xmlns/1.1/graphml-attributes.xsd
      and
      http://graphml.graphdrawing.org/xmlns/1.1/graphml-parseinfo.xsd,
@@ -125,7 +125,7 @@
       The complex type data-extension.type is empty per default.
       Users may redefine this type in order to add content to 
       the complex types data.type and default.type which are 
-      extensions of data-extension.type.
+      extension of data-extension.type.
     </xs:documentation>
   </xs:annotation>
 </xs:complexType>

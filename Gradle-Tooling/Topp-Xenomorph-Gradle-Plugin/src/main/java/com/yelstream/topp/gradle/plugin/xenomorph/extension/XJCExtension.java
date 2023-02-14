@@ -7,6 +7,7 @@ import groovy.lang.Closure;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.tasks.SourceSet;
@@ -32,12 +33,14 @@ public class XJCExtension {
     public XJCExtension(Project project) {
         this.project=project;
         resource=ResourceFactory.of(project);
+        schema=new SchemaReferenceFactory(project);
     }
 
     public XJCExtension(Project project,
                         SourceSet sourceSet) {
         this.project=project;
         resource=ResourceFactory.of(project,sourceSet);
+        schema=new SchemaReferenceFactory(project);
     }
 
     public static XJCExtension get(Project project) {
@@ -73,10 +76,12 @@ public class XJCExtension {
 
         @Data
         @NoArgsConstructor
-        public static class Options {
+        public static class Option {
 
             private boolean nv;
+
             private boolean extension;
+
             private List<File> bindingFile=new ArrayList<>();
 
             private File outputDirectory;
@@ -116,15 +121,19 @@ public class XJCExtension {
             private boolean wsdl;
 
             private boolean verbose;
+
             private boolean quiet;
+
             private boolean help;
+
             private boolean version;
+
             private boolean fullversion;
         }
 
         @Data
         @NoArgsConstructor
-        public static class Extensions {
+        public static class Extension {
             private boolean xInjectCode;
             private boolean xLocator;
             private boolean xSyncMethods;
@@ -135,35 +144,39 @@ public class XJCExtension {
             private boolean xPropertyAccessors;
         }
 
-        private Options options;
-        private Extensions extensions;
+        private Option option;
+        private Extension extension;
 
-        public void setOptions(Options options) {
-            if (this.options!=null) {
+        @Getter
+        @Setter
+        public Extension extension2;
+
+        public void setOption(Option option) {
+            if (this.option!=null) {
                 throw new IllegalStateException("Failure to set options; the options structure has already been set!");
             }
-            this.options=options;
+            this.option=option;
         }
 
-        public void setExtensions(Extensions extensions) {
-            if (this.extensions!=null) {
+        public void setExtension(Extension extension) {
+            if (this.extension !=null) {
                 throw new IllegalStateException("Failure to set extensions; the extension structure has already been set!");
             }
-            this.extensions=extensions;
+            this.extension = extension;
         }
 
-        public Options options(Closure<Options> closure) {
+        public Option option(Closure<Option> closure) {
             @SuppressWarnings("java:S1117")
-            Options options=(Options)project.configure(new Options(),closure);
-            setOptions(options);
-            return options;
+            Option option=(Option)project.configure(new Option(),closure);
+            setOption(option);
+            return option;
         }
 
-        public Extensions extensions(Closure<Extensions> closure) {
+        public Extension extension(Closure<Extension> closure) {
             @SuppressWarnings("java:S1117")
-            Extensions extensions=(Extensions)project.configure(new Extensions(),closure);
-            setExtensions(extensions);
-            return extensions;
+            Extension extension=(Extension)project.configure(new Extension(),closure);
+            setExtension(extension);
+            return extension;
         }
     }
 
@@ -175,5 +188,5 @@ public class XJCExtension {
         return run;
     }
 
-    private SchemaReferenceFactory schema=new SchemaReferenceFactory();
+    private final SchemaReferenceFactory schema;
 }

@@ -33,7 +33,7 @@ public class CommandInitiator {
     /**
      * Command arguments.
      */
-    private final Argument argument;
+    private final Arguments arguments;
 
     /**
      * Source of destinations for output data.
@@ -70,7 +70,7 @@ public class CommandInitiator {
         OutputStream errorStream=errorStreamSupplier.get();
 
         Command.Builder builder=Command.builder();
-        builder.argument(argument).outputStream(outputStream).errorStream(errorStream);
+        builder.arguments(arguments).outputStream(outputStream).errorStream(errorStream);
 
         Future<Result> future=new RunnableFuture<>() {
             private Exception ex;
@@ -79,7 +79,7 @@ public class CommandInitiator {
             @Override
             public void run() {
                 try {
-                    int code= driver.execute(argument.getArguments(),outputStream,errorStream);
+                    int code= driver.execute(arguments.getArguments(),outputStream,errorStream);
 
                     Result.Builder builder=Result.builder();
 
@@ -144,16 +144,16 @@ public class CommandInitiator {
 
     /**
      * Creates a command-initiator using a {@link PrintStream}-based driver as its offset.
-     * @param argument Command arguments.
+     * @param arguments Command arguments.
      * @param driver Command driver
      * @param statusVerifier  Status verifier.
      * @return Command-initiator.
      */
-    public static CommandInitiator createCommandInitiator(Argument argument,
+    public static CommandInitiator createCommandInitiator(Arguments arguments,
                                                           Driver<PrintStream,Exception> driver,
                                                           IntConsumer statusVerifier) {
         CommandInitiator.Builder builder=CommandInitiator.builder();
-        builder.argument(argument);
+        builder.arguments(arguments);
 
         builder.outputStreamSupplier(ByteArrayOutputStream::new);
         builder.errorStreamSupplier(ByteArrayOutputStream::new);

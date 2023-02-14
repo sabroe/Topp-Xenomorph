@@ -30,7 +30,7 @@ public class PluginManagers {
             SourceSet sourceSet=sourceSets.getByName(sourceSetName);
 
 //            String dir=new File(buildDir,OUTPUT_DIRECTORY_NAME).toString();
-            String dir=new File(buildDir,String.format("xenomorph/%s/java/src",this.getName())).toString();
+            String dir=new File(buildDir,String.format("Xenomorph/%s/java/src",this.getName())).toString();
             sourceSet.getJava().srcDir(dir);
         });
 

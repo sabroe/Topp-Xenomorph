@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../../basictypes/AirportIATA.xsd" />
+    <xs:include schemaLocation="../../basictypes/DateUTC.xsd" />
+    <xs:include schemaLocation="../../basictypes/BagTagNumber.xsd" />
+    <xs:include schemaLocation="../../basictypes/BagTagSerialNumber.xsd" />
+    <xs:include schemaLocation="../../basictypes/BagTagLeadingDigit.xsd" />
+    <xs:include schemaLocation="../../basictypes/AirlineIATAThreeNumeric.xsd" />
+    <xs:include schemaLocation="../../basictypes/BagTagNumberGDPR.xsd" />
+    <xs:include schemaLocation="../../basictypes/BagTagUnique.xsd" />
+    <xs:include schemaLocation="../../basictypes/BagTagStatus.xsd" />
+    <xs:include schemaLocation="../../basictypes/BagCategory.xsd" />
+    <xs:include schemaLocation="../../basictypes/PnrCode.xsd" />
+    <xs:include schemaLocation="../../basictypes/PnrCodeGDPR.xsd" />
+    <xs:include schemaLocation="../../basictypes/FlightId.xsd" />
+    <xs:include schemaLocation="../../basictypes/AirlineIATA.xsd" />
+    <xs:include schemaLocation="../../basictypes/DateTimeUTC.xsd" />
+    <xs:include schemaLocation="../../basictypes/HandlerCode.xsd" />
+    <xs:include schemaLocation="../../basictypes/Kilo.xsd" />
+    <xs:include schemaLocation="../../basictypes/Count.xsd" />
+    <xs:include schemaLocation="../../basictypes/BagLocation.xsd" />
+    <xs:include schemaLocation="../../basictypes/BagIrregularityCode.xsd" />
+    <xs:include schemaLocation="../../basictypes/JsonData.xsd" />
+
+    <xs:complexType name="BagStateData">
+        <xs:sequence>
+            <xs:element name="bagStateAirportIATA" type="AirportIATA" minOccurs="1" />
+            <xs:element name="bagStateDate" type="DateUTC" minOccurs="1" />
+            <xs:element name="bagTagNumber" type="BagTagNumber" minOccurs="1" />
+            <xs:element name="bagTagLeadingDigit" type="BagTagLeadingDigit" minOccurs="1" />
+            <xs:element name="bagTagIssuerCode" type="AirlineIATAThreeNumeric" minOccurs="1" />
+            <xs:element name="bagTagSerialNumber" type="BagTagSerialNumber" minOccurs="1" />
+            <xs:element name="bagTagIssuerAirlineIATA" type="AirlineIATA" minOccurs="0" />
+            <xs:element name="bagTagNumberGDPR" type="BagTagNumberGDPR" minOccurs="1" />
+            <xs:element name="bagTagUnique" type="BagTagUnique" minOccurs="1" />
+            <xs:element name="bagTagStatus" type="BagTagStatus" minOccurs="1" />
+            <xs:element name="bagCategory" type="BagCategory" minOccurs="0" />
+            <xs:element name="bagPnrCode" type="PnrCode" minOccurs="0" />
+            <xs:element name="bagPnrCodeGDPR" type="PnrCodeGDPR" minOccurs="0" />
+            <xs:element name="passengerHasPassedSecurity" type="xs:boolean" minOccurs="0" />
+            <xs:element name="passengerHasBoarded" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagPreviousAirportIATA" type="AirportIATA" minOccurs="0" />
+            <xs:element name="bagArrivalFlightId" type="FlightId" minOccurs="0" />
+            <xs:element name="bagArrivalOperatingAirlineIATA" type="AirlineIATA" minOccurs="0" />
+            <xs:element name="SIBT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="AIBT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="bagNextAirportIATA" type="AirportIATA" minOccurs="0" />
+            <xs:element name="bagDepartureFlightId" type="FlightId" minOccurs="0" />
+            <xs:element name="bagDepartureOperatingAirlineIATA" type="AirlineIATA" minOccurs="0" />
+            <xs:element name="SOBT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="AOBT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="bagFinalAirportIATA" type="AirportIATA" minOccurs="0" />
+            <xs:element name="bagHandlerCodeArrival" type="HandlerCode" minOccurs="0" />
+            <xs:element name="bagHandlerCodeDeparture" type="HandlerCode" minOccurs="0" />
+            <xs:element name="bagTypeIndicator" type="xs:string" minOccurs="0" />
+            <xs:element name="bagSizeIndicator" type="xs:string" minOccurs="0" />
+            <xs:element name="bagWeight" type="Kilo" minOccurs="0" />
+            <xs:element name="bagIsPrio" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagIsRush" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagIsCrew" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagCanBeLoaded" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagCanBeTransported" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagNewTagNumber" type="BagTagNumber" minOccurs="0" />
+            <xs:element name="bagPreviousTagNumber" type="BagTagNumber" minOccurs="0" />
+            <xs:element name="bagTotalTimeInBhs" type="xs:duration" minOccurs="0" />
+            <xs:element name="bagNetTimeInBhs" type="xs:duration" minOccurs="0" />
+            <xs:element name="bagTotalTimeInMcs" type="xs:duration" minOccurs="0" />
+            <xs:element name="bagTotalTimeAtSecScreen" type="xs:duration" minOccurs="0" />
+            <xs:element name="bagTimeAtAutSecScreen" type="xs:duration" minOccurs="0" />
+            <xs:element name="bagTimeAtManSecScreen" type="xs:duration" minOccurs="0" />
+            <xs:element name="bagTotalTimeInEbs" type="xs:duration" minOccurs="0" />
+            <xs:element name="bagBhsDeliveryAttemptsTime" type="xs:duration" minOccurs="0" />
+            <xs:element name="bagBhsTransportTime" type="xs:duration" minOccurs="0" />
+            <xs:element name="bagBhsTimeExceededBy" type="xs:duration" minOccurs="0" />
+            <xs:element name="bagBhsTimeExceededGroup" type="xs:string" minOccurs="0" />
+            <xs:element name="bagEventCount" type="Count" minOccurs="0" />
+            <xs:element name="bagInfoMsgCount" type="Count" minOccurs="0" />
+            <xs:element name="bagToMcsCount" type="Count" minOccurs="0" />
+            <xs:element name="bagBhsBinDeliveryAttempts" type="Count" minOccurs="0" />
+            <xs:element name="BTGRT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="bagTagPrintedLocation" type="BagLocation" minOccurs="0" />
+            <xs:element name="BFCAT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="bagFirstRejectReason" type="xs:string" minOccurs="0" />
+            <xs:element name="BACIT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="bagCheckinType" type="xs:string" minOccurs="0" />
+            <xs:element name="bagCheckinLocation" type="BagLocation" minOccurs="0" />
+            <xs:element name="BABBT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTFST" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTAST" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTMST" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTL1T" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTL2T" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTL3T" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTL4T" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTL5T" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BFLST" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BFAST" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BFMST" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BFL1T" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BFL2T" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BFL3T" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BFL4T" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BFL5T" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTMCT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BFMCT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTEBT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BFEBT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BEBFT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTBBT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="bagPlannedBin" type="BagLocation" minOccurs="0" />
+            <xs:element name="bagActualBin" type="BagLocation" minOccurs="0" />
+            <xs:element name="BFBBT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BLOAT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BUNLT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTOTT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BAOBT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTPATE" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="BTPAT" type="DateTimeUTC" minOccurs="0" />
+            <xs:element name="bagWasRejected" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagWasDeliveredToBhsInTime" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagWasDeliveredToBhsLate" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagWasDeliveredToBhsTooLate" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagWasDeliveredFromBhsInTime" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagWasDeliveredFromBhsLate" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagWasDeliveredFromBhsTooLate" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagWasSentToMcs" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagWasSentToProblemBin" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagBsmWasProblem" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagTagWasNotSeenInBhs" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagHasLoadedEvent" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagWasLost" type="xs:boolean" minOccurs="0" />
+            <xs:element name="bagLostIrregularityCode" type="BagIrregularityCode" minOccurs="0" />
+            <xs:element name="bagLostAirportIATA" type="AirportIATA" minOccurs="0" />
+            <xs:element name="bagLostDate" type="DateUTC" minOccurs="0" />
+            <xs:element name="bagLostFlightId" type="FlightId" minOccurs="0" />
+            <xs:element name="bagLostAdditionalData" type="JsonData" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

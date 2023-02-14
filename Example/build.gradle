@@ -11,6 +11,7 @@ javadoc {
     exclude 'org/iso/std/iso/_20022/**'
     exclude 'net/gexf/**'
     exclude 'org/graphdrawing/**'
+    exclude 'aero/**'
 //    options.addBooleanOption('Xdoclint:none',true)
 }
 
@@ -20,6 +21,7 @@ sourceSets {
             exclude 'org/iso/std/iso/_20022/**'
             exclude 'net/gexf/**'
             exclude 'org/graphdrawing/**'
+            exclude 'aero/**'
         }
     }
 }
@@ -36,27 +38,16 @@ sourceSets{
     sourceSets {
         main {
             xjc {
-                //resourceDir = project.file('src/main/resources')
+                resource.defaultResourceDir = project.file('src/main/resources/Avinor/Baggage-Information-Exchange-Service/bix-service-1.4.0')
                 run {
-                    name = 'Test generation of ISO 20022 XML Schema'
+                    name = 'Avinor - Baggage Information Exchange Service'
                     enable = true
-                    sourceSchema += schema.of(resource.file('xsd/pain.001.001.02.xsd'))
-                    options {
-                        bindingFile += resource.file('xjb/mapping.xjb')
+                    sourceSchema += schema.of(resource.file('wsdl/bixservice/BixService.wsdl'))
+                    option {
+//                        bindingFile += resource.file('xjb/mapping.xjb')
+                        wsdl = true
                     }
-                    extensions {
-                    }
-                }
-                run {
-                    name = 'Test generation of GraphML XML Schema'
-                    enable = true
-                    sourceSchema += schema.of(resource.file('xsd/GraphML/graphml-parseinfo.xsd'))
-                    sourceSchema += schema.of(resource.file('xsd/GraphML/graphml-attributes.xsd'))
-                    options {
-                        catalogFile = resource.file('cat/catalog.cat')
-                        targetPackage = 'org.graphdrawing.graphml._1_0'
-                    }
-                    extensions {
+                    extension {
                     }
                 }
             }
@@ -71,10 +62,10 @@ sourceSets{
             name = 'Test generation of ISO 20022 XML Schema'
             enable = true
             sourceSchema += schema.of(resource.file('xsd/pain.001.001.02.xsd'))
-            options {
+            option {
                 bindingFile += resource.file('xjb/mapping.xjb')
             }
-            extensions {
+            extension {
             }
         }
         run {
@@ -82,21 +73,21 @@ sourceSets{
             enable = true
             sourceSchema += schema.of(resource.file('xsd/GraphML/graphml-parseinfo.xsd'))
             sourceSchema += schema.of(resource.file('xsd/GraphML/graphml-attributes.xsd'))
-            options {
+            option {
                 catalogFile = resource.file('cat/catalog.cat')
                 targetPackage = 'org.graphdrawing.graphml._1_0'
             }
-            extensions {
+            extension {
             }
         }
         run {
             name = 'Test generation of GEXF XML Schema'
             enable = true
             sourceSchema += schema.of(resource.file('xsd/Graph-Exchange-XML/1.2/XSD/gexf.xsd'))
-            options {
+            option {
                 bindingFile += resource.file('xjb/Graph-Exchange-XML/1.2/mapping.xjb')
             }
-            extensions {
+            extension {
             }
         }
     }

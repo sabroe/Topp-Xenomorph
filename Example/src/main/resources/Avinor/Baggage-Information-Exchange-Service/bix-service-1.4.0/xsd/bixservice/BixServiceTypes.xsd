@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.asrv.aero/webservices/1.1/BIXService/datadefinitions"
+           elementFormDefault="qualified"
+           version="1.0.0">
+
+    <xs:include schemaLocation="../basictypes/ResponseStatusCode.xsd"/>
+    <xs:include schemaLocation="../basictypes/ResponseStatusText.xsd"/>
+    <xs:include schemaLocation="../metadata/TransData.xsd"/>
+    <xs:include schemaLocation="entities/BagCheckInData.xsd"/>
+    <xs:include schemaLocation="entities/BagEventData.xsd"/>
+    <xs:include schemaLocation="entities/BagLostData.xsd"/>
+    <xs:include schemaLocation="entities/BagScanData.xsd"/>
+    <xs:include schemaLocation="entities/BhsEventData.xsd"/>
+    <xs:include schemaLocation="entities/BimData.xsd"/>
+    <xs:include schemaLocation="entities/FlightBinData.xsd"/>
+
+</xs:schema>

@@ -3,6 +3,7 @@ package com.yelstream.topp.gradle.plugin.xenomorph.util;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.gradle.api.Project;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import java.util.function.BiFunction;
  * @version 1.0
  * @since 2023-01-14
  */
+@ToString
 @Getter
 @AllArgsConstructor(access=AccessLevel.PRIVATE)
 @lombok.Builder(builderClassName="Builder",toBuilder=true)

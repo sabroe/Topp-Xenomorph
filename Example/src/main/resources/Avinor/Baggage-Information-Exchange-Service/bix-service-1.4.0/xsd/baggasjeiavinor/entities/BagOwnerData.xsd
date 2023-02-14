@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../../basictypes/PnrCode.xsd"/>
+    <xs:include schemaLocation="../../basictypes/PnrCodeGDPR.xsd"/>
+
+    <xs:complexType name="BagOwnerData">
+        <xs:sequence>
+            <xs:element name="bagPnrCode" type="PnrCode" minOccurs="0"/>
+            <xs:element name="bagPnrCodeGDPR" type="PnrCodeGDPR" minOccurs="0"/>
+            <xs:element name="passengerHasBoarded" type="xs:boolean" minOccurs="0" />
+            <xs:element name="passengerHasPassedSecurity" type="xs:boolean" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

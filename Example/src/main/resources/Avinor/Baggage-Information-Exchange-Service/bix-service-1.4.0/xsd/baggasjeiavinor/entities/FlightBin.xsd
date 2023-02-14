@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../../basictypes/BagLocation.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BinSegregationCode.xsd"/>
+
+    <xs:complexType name="FlightBin">
+        <xs:sequence>
+            <xs:element name="bin" type="BagLocation"/>
+            <xs:element name="binSegregationCode" type="BinSegregationCode"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
+
+

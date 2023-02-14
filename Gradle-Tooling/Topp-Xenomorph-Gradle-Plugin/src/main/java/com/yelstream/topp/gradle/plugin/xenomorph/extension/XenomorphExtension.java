@@ -3,6 +3,9 @@ package com.yelstream.topp.gradle.plugin.xenomorph.extension;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.gradle.api.Project;
+import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.plugins.ExtensionContainer;
+import org.gradle.internal.extensibility.DefaultConvention;
 
 /**
  * Gradle extension linked to usages of plugin.
@@ -11,7 +14,7 @@ import org.gradle.api.Project;
  * @version 1.0
  * @since 2023-01-14
  */
-public class XenomorphExtension {
+public abstract class XenomorphExtension implements ExtensionAware {
     /**
      * Extension name as used in Gradle build files.
      */
@@ -36,5 +39,14 @@ public class XenomorphExtension {
 /*
     @Getter
     private final SchemaGenExtension schemaGen;
+*/
+
+/*
+    private DefaultConvention extensions=new DefaultConvention();
+
+    @Override
+    public ExtensionContainer getExtensions() {
+        return extensions;
+    }
 */
 }

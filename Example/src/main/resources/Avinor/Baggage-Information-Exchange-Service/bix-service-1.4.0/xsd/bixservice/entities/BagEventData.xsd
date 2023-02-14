@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../../basictypes/AirportIATA.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagTagNumber.xsd"/>
+    <xs:include schemaLocation="../../basictypes/FlightId.xsd"/>
+    <xs:include schemaLocation="../../basictypes/PnrCode.xsd"/>
+    <xs:include schemaLocation="../../basictypes/DateTimeUTC.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagLocation.xsd"/>
+
+    <xs:include schemaLocation="BagEvent.xsd"/>
+    <xs:include schemaLocation="BagPhysical.xsd"/>
+    <xs:include schemaLocation="BagSegment.xsd"/>
+
+    <xs:complexType name="BagEventData">
+        <xs:sequence>
+            <xs:element name="bagTagNumber" type="BagTagNumber"/>
+            <xs:element name="bagEvent" type="BagEvent"/>
+            <xs:element name="bagPreviousAirportIATA" type="AirportIATA" minOccurs="0"/>
+            <xs:element name="bagNextAirportIATA" type="AirportIATA" minOccurs="0"/>
+            <xs:element name="bagFinalAirportIATA" type="AirportIATA" minOccurs="0"/>
+            <xs:element name="bagSegment" type="BagSegment" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="bagDepartureFlightId" type="FlightId" minOccurs="0"/>
+            <xs:element name="bagPhysical" type="BagPhysical" minOccurs="0"/>
+            <xs:element name="bagPnrCode" type="PnrCode" minOccurs="0"/>
+            <xs:element name="BEBFT" type="DateTimeUTC" minOccurs="0"/>
+            <xs:element name="bagPlannedBin" type="BagLocation" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

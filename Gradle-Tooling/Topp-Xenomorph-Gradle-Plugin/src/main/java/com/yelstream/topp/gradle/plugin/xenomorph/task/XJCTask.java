@@ -3,7 +3,6 @@ package com.yelstream.topp.gradle.plugin.xenomorph.task;
 import com.yelstream.topp.command.Status;
 import com.yelstream.topp.gradle.api.SourceSets;
 import com.yelstream.topp.gradle.plugin.xenomorph.configuration.PluginConfigurations;
-import com.yelstream.topp.gradle.plugin.xenomorph.context.PluginContext;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.PluginExtensions;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtension;
 import com.yelstream.topp.gradle.plugin.xenomorph.extension.XJCExtensions;
@@ -173,10 +172,10 @@ SourceDirectorySet x=sourceSet.getResources();
 System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
 }
 //        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(OUTPUT_DIRECTORY_NAME));
-//        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(String.format("xenomorph/%s/java/src",this.getName())));
-        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(String.format("xenomorph/%s",this.getName())));
+//        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(String.format("Xenomorph/%s/java/src",this.getName())));
+        outputDirectory=getObjectFactory().directoryProperty().convention(getProjectLayout().getBuildDirectory().dir(String.format("Xenomorph/%s",this.getName())));
 
-//File _dir=new File(buildDir,String.format("xenomorph/%s/java/src",this.getName()));
+//File _dir=new File(buildDir,String.format("Xenomorph/%s/java/src",this.getName()));
 //_dir.mkdirs();
 
 
@@ -188,7 +187,7 @@ System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
 /*
         {
 //            String dir=new File(buildDir,OUTPUT_DIRECTORY_NAME).toString();
-            File dir=new File(buildDir,String.format("xenomorph/%s/java/src",this.getName()));
+            File dir=new File(buildDir,String.format("Xenomorph/%s/java/src",this.getName()));
             SourceSets.addJavaSourceDirectory(sourceSet,dir);
         }
 */
@@ -207,6 +206,8 @@ System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
         private final Map<String, Object> taskProperties;
 
         private final XJCExtension extension;
+
+        private final String setupName;
 
         private final Integer runIndex;
 
@@ -247,31 +248,24 @@ System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
 
             XJCExtensions.ExtensionGroup eg=pluginExtensions.getXjcExtensions().getExtensions().get(sourceSet.getName());
             XJCExtension extension=eg.getGlobalExtension();
+XJCExtension extension2=eg.getSourceSetExtension();
+//System.out.println("Global extension: "+extension);
+//System.out.println("SourceSet extension: "+extension2);
 
+            RunContext.Builder builder=RunContext.builder();
+            builder.projectProperties(projectProperties);
+            builder.taskProperties(taskProperties);
 
-            //XJCExtension extension=XJCExtension.get(project);
-            if (!extension.isEnable()) {
-                logger.info("Task internals is disabled!");
-            } else {
-                RunContext.Builder builder= RunContext.builder();
-                builder.projectProperties(projectProperties);
-                builder.taskProperties(taskProperties);
+            if (extension!=null) {
+                builder.setupName="Global";
                 builder.extension(extension);
-                RunContext runContext=builder.build();
+                executeRuns(builder.build());
+            }
 
-                List<XJCExtension.Run> runs=extension.getRuns();
-
-                if (runs==null || runs.isEmpty()) {
-                    logger.debug("Nothing to do!");
-                } else {
-
-                    int runIndex = 0;
-                    for (XJCExtension.Run run : runs) {
-                        runContext=runContext.toBuilder().runIndex(runIndex).run(run).build();
-                        executeRun(runContext);
-                        runIndex++;
-                    }
-                }
+            if (extension2!=null) {
+                builder.setupName="SourceSet";
+                builder.extension(extension2);
+                executeRuns(builder.build());
             }
         } catch (Exception ex) {
             throw new TaskExecutionException(this,ex);
@@ -283,44 +277,52 @@ System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
     //https://docs.oracle.com/javase/tutorial/jaxp/properties/properties.html
  */
 
-/*
-    DGML
-         http://schemas.microsoft.com/vs/2009/dgml
-         https://learn.microsoft.com/en-us/visualstudio/modeling/directed-graph-markup-language-dgml-reference?view=vs-2022
-    XGMML
-         https://www.reviversoft.com/en/file-extensions/xgmml
-         https://en.wikipedia.org/wiki/XGMML
-    PhyloXML
-         http://www.phyloxml.org/
-         https://en.wikipedia.org/wiki/PhyloXML
-    NeXML
-         http://etetoolkit.org/docs/latest/tutorial/tutorial_nexml.html
-         https://en.wikipedia.org/wiki/NeXML_format
-         http://nexml.org/
-*/
+    private void executeRuns(RunContext runContext) throws Exception {
+        Logger logger=getLogger();
+
+        XJCExtension extension=runContext.getExtension();
+        if (!extension.isEnable()) {
+            logger.info("Task internals is disabled!");
+        } else {
+            List<XJCExtension.Run> runs=extension.getRuns();
+
+            if (runs==null || runs.isEmpty()) {
+                logger.debug("Nothing to do!");
+            } else {
+
+                int runIndex = 0;
+                for (XJCExtension.Run run : runs) {
+                    runContext=runContext.toBuilder().runIndex(runIndex).run(run).build();
+                    executeRun(runContext);
+                    runIndex++;
+                }
+            }
+        }
+    }
 
     private void executeRun(RunContext runContext) throws Exception {
         Project project=getProject();
         Logger logger=getLogger();
 
-        Integer index=runContext.getRunIndex();
+        String setupName=runContext.getSetupName();
+        Integer runIndex=runContext.getRunIndex();
         String name=runContext.getRun().getName();
         XJCExtension extension=runContext.getExtension();
         XJCExtension.Run run=runContext.getRun();
 
         if (logger.isDebugEnabled()) {
             if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Executing run; run #%d, name %s, run is %s!",index,name,run));
+                logger.debug(String.format("Executing run; run #%d, name %s, run is %s!",runIndex,name,run));
             }
         }
 
         if (!run.isEnable()) {
             if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Executing run is disabled; run #%d, name %s, run is %s!",index,name,run));
+                logger.debug(String.format("Executing run is disabled; run #%d, name %s, run is %s!",runIndex,name,run));
             }
         } else {
-            XJCExtension.Run.Options options=run.getOptions();
-            XJCExtension.Run.Extensions extensions=run.getExtensions();
+            XJCExtension.Run.Option option=run.getOption();  //TODO: Rename to .... runOption
+            XJCExtension.Run.Extension extensions=run.getExtension();  //TODO: Rename to .... runExtension
 
             File buildDir=project.getBuildDir();
             Path buildDirectoryPath=project.getBuildDir().toPath();
@@ -328,22 +330,22 @@ System.out.println("inputSchemaFiles: "+inputSchemaFiles.getFiles());
 
             List<String> args=new ArrayList<>();
 
-            if (options.isNv()) {
+            if (option.isNv()) {
                 args.add("-nv");
             }
 
-            if (options.isExtension()) {
+            if (option.isExtension()) {
                 args.add("-extension");
             }
 
             {  //TODO: DO SOMETHING ELSE IF DIR IS DECLARED!
 //                Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(OUTPUT_DIRECTORY_NAME));
-                Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(String.format("xenomorph/%s/run/%d/java/src",this.getName(),index)));
+                Path generatedFilesDirectory=buildDirectoryPath.resolve(Paths.get(String.format("Xenomorph/%s/Setup-%s/Run/Run-%d/java/src",this.getName(),setupName,runIndex)));
                 args.add("-d");
                 args.add(generatedFilesDirectory.toAbsolutePath().toString());
 
 {
-    File dir=new File(buildDir,String.format("xenomorph/%s/run/%d/java/src",this.getName(),index));
+    File dir=new File(buildDir,String.format("Xenomorph/%s/Setup-%s/Run/Run-%d/java/src",this.getName(),setupName,runIndex));
 dir.mkdirs();
     SourceSets.addJavaSourceDirectory(sourceSet,dir);
 //System.out.println(sourceSet.getAllJava().getSrcDirs());
@@ -351,7 +353,7 @@ dir.mkdirs();
             }
 
             {
-                String targetPackage=options.getTargetPackage();
+                String targetPackage=option.getTargetPackage();
                 if (targetPackage!=null) {
                     args.add("-p");
                     args.add(targetPackage);
@@ -359,7 +361,7 @@ dir.mkdirs();
             }
 
             {
-                String moduleName=options.getModuleName();
+                String moduleName=option.getModuleName();
                 if (moduleName!=null) {
                     args.add("-m");
                     args.add(moduleName);
@@ -367,7 +369,7 @@ dir.mkdirs();
             }
 
             {
-                String httpProxy=options.getHttpProxy();
+                String httpProxy=option.getHttpProxy();
                 if (httpProxy!=null) {
                     args.add("-httpproxy");
                     args.add(httpProxy);
@@ -375,7 +377,7 @@ dir.mkdirs();
             }
 
             {
-                File httpProxyFile=options.getHttpProxyFile();
+                File httpProxyFile=option.getHttpProxyFile();
                 if (httpProxyFile!=null) {
                     args.add("-httpproxyfile");
                     args.add(httpProxyFile.getAbsolutePath());  //TODO: Ensure file is resolved properly!
@@ -383,7 +385,7 @@ dir.mkdirs();
             }
 
             {
-                File httpProxyFile=options.getHttpProxyFile();
+                File httpProxyFile=option.getHttpProxyFile();
                 if (httpProxyFile!=null) {
                     args.add("-httpproxyfile");
                     args.add(httpProxyFile.getAbsolutePath());  //TODO: Ensure file is resolved properly!
@@ -391,7 +393,7 @@ dir.mkdirs();
             }
 
             {
-                String classpath=options.getClasspath();
+                String classpath=option.getClasspath();
                 if (classpath!=null) {
                     args.add("-classpath");
                     args.add(classpath);
@@ -399,7 +401,7 @@ dir.mkdirs();
             }
 
             {
-                File catalogFile=options.getCatalogFile();
+                File catalogFile=option.getCatalogFile();
                 if (catalogFile!=null) {
                     args.add("-catalog");
 /*
@@ -413,20 +415,20 @@ dir.mkdirs();
                 logger.info("Catalog files may be tracked by using '-Dxml.catalog.verbosity=999'.");
             }
 
-            if (options.isReadOnly()) {
+            if (option.isReadOnly()) {
                 args.add("-readOnly");
             }
 
-            if (options.isNpa()) {
+            if (option.isNpa()) {
                 args.add("-npa");
             }
 
-            if (options.isNoHeader()) {
+            if (option.isNoHeader()) {
                 args.add("-no-header");
             }
 
             {
-                String target=options.getTarget();
+                String target=option.getTarget();
                 if (target!=null) {
                     args.add("-target");
                     args.add(target);
@@ -434,54 +436,54 @@ dir.mkdirs();
             }
 
             {
-                String encoding=options.getEncoding();  //TODO: Consider default!
+                String encoding=option.getEncoding();  //TODO: Consider default!
                 if (encoding!=null) {
                     args.add("-encoding");
                     args.add(encoding);
                 }
             }
 
-            if (options.isEnableIntrospection()!=false) {
+            if (option.isEnableIntrospection()!=false) {
                 args.add("-enableIntrospection");
             }
 
-            if (options.isDisableXmlSecurity()) {
+            if (option.isDisableXmlSecurity()) {
                 args.add("-disableXmlSecurity");
             }
 
-            if (options.isContentForWildcard()) {
+            if (option.isContentForWildcard()) {
                 args.add("-contentForWildcard");
             }
 
-            if (options.isXmlschema()) {
+            if (option.isXmlschema()) {
                 args.add("-xmlschema");
             }
 
-            if (options.isDtd()) {
+            if (option.isDtd()) {
                 args.add("-dtd");
             }
 
-            if (options.isWsdl()) {
+            if (option.isWsdl()) {
                 args.add("-wsdl");
             }
 
-            if (options.isVerbose()) {
+            if (option.isVerbose()) {
                 args.add("-verbose");
             }
 
-            if (options.isQuiet()) {
+            if (option.isQuiet()) {
                 args.add("-quiet");
             }
 
-            if (options.isHelp()) {
+            if (option.isHelp()) {
                 args.add("-help");
             }
 
-            if (options.isVersion()) {
+            if (option.isVersion()) {
                 args.add("-version");
             }
 
-            if (options.isFullversion()) {
+            if (option.isFullversion()) {
                 args.add("-fullversion");
             }
 
@@ -497,8 +499,8 @@ dir.mkdirs();
                 }
             }
 
-            if (options.getBindingFile()!=null) {
-                List<File> bindingFiles=options.getBindingFile();
+            if (option.getBindingFile()!=null) {
+                List<File> bindingFiles=option.getBindingFile();
                 for (File binding: bindingFiles) {
                     Path bindingPath=binding.toPath();
                     Path bindingFilesDirectory=projectDir.resolve(bindingPath);
@@ -561,7 +563,7 @@ dir.mkdirs();
                         logger.warn("Run is dry; run is marked a dry run!");
                     } else {
                         if (logger.isDebugEnabled()) {
-                            logger.debug(String.format("Executing run; run #%d, name %s, run is %s, arguments to 'xjc' are '%s'!",index,name,run,args));
+                            logger.debug(String.format("Executing run; run #%d, name %s, run is %s, arguments to 'xjc' are '%s'!",runIndex,name,run,args));
                         }
                         XJCUtility.executeCommandToLogger(args,null,getLogger());
                     }

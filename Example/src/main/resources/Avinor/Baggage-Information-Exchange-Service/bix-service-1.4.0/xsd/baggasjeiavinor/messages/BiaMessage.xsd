@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.avinor.no/bia/1.1/BiaMessage"
+           targetNamespace="http://www.avinor.no/bia/1.1/BiaMessage"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           version="1.0.0">
+
+    <xs:include schemaLocation="../entities/BagAdditionalInfo.xsd"/>
+    <xs:include schemaLocation="../entities/BagEventData.xsd"/>
+    <xs:include schemaLocation="../entities/BagLostData.xsd"/>
+    <xs:include schemaLocation="../entities/BagOwnerData.xsd"/>
+    <xs:include schemaLocation="../entities/BagPhysicalData.xsd"/>
+    <xs:include schemaLocation="../entities/BagRouteData.xsd"/>
+    <xs:include schemaLocation="../entities/BagTagData.xsd"/>
+    <xs:include schemaLocation="../metadata/AmbiHeader.xsd"/>
+
+    <xs:element name="BiaMessage">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ambiHeader" type="AmbiHeader"/>
+                <xs:element name="bagTag" type="BagTagData"/>
+                <xs:element name="bagEvent" type="BagEventData"/>
+                <xs:element name="bagPhysical" type="BagPhysicalData" minOccurs="0"/>
+                <xs:element name="bagOwner" type="BagOwnerData" minOccurs="0"/>
+                <xs:element name="bagRoute" type="BagRouteData" minOccurs="0"/>
+                <xs:element name="bagLost" type="BagLostData" minOccurs="0"/>
+                <xs:element name="bagAdditionalInfo" type="BagAdditionalInfo" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

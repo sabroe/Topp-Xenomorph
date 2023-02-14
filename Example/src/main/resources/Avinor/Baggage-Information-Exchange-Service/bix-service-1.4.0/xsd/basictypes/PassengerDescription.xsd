@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+    <xs:include schemaLocation="String1.xsd"/>
+    <xs:complexType name="PassengerDescription">
+        <xs:simpleContent>
+            <xs:extension base="String1"/>
+        </xs:simpleContent>
+    </xs:complexType>
+</xs:schema>

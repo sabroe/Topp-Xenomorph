@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             xmlns:tns="http://www.asrv.aero/webservices/1.1/BIXService"
+             targetNamespace="http://www.asrv.aero/webservices/1.1/BIXService"
+             name="BixService">
+
+    <types>
+        <xs:schema>
+            <xs:import namespace="http://www.asrv.aero/webservices/1.1/BIXService"
+                       schemaLocation="../../xsd/bixservice/BixService.xsd"/>
+        </xs:schema>
+    </types>
+
+    <message name="setBagCheckInDataRequest">
+        <part name="parameters" element="tns:setBagCheckInDataRequest"/>
+    </message>
+    <message name="setBagCheckInDataResponse">
+        <part name="parameters" element="tns:responseStatus"/>
+    </message>
+
+    <message name="setBagEventDataRequest">
+        <part name="parameters" element="tns:setBagEventDataRequest"/>
+    </message>
+    <message name="setBagEventDataResponse">
+        <part name="parameters" element="tns:responseStatus"/>
+    </message>
+
+    <message name="setBagLostDataRequest">
+        <part name="parameters" element="tns:setBagLostDataRequest"/>
+    </message>
+    <message name="setBagLostDataResponse">
+        <part name="parameters" element="tns:responseStatus"/>
+    </message>
+
+    <message name="setBagScanDataRequest">
+        <part name="parameters" element="tns:setBagScanDataRequest"/>
+    </message>
+    <message name="setBagScanDataResponse">
+        <part name="parameters" element="tns:responseStatus"/>
+    </message>
+
+    <message name="setBhsEventDataRequest">
+        <part name="parameters" element="tns:setBhsEventDataRequest"/>
+    </message>
+    <message name="setBhsEventDataResponse">
+        <part name="parameters" element="tns:responseStatus"/>
+    </message>
+
+    <message name="setBimDataRequest">
+        <part name="parameters" element="tns:setBimDataRequest"/>
+    </message>
+    <message name="setBimDataResponse">
+        <part name="parameters" element="tns:responseStatus"/>
+    </message>
+
+    <message name="setFlightBinDataRequest">
+        <part name="parameters" element="tns:setFlightBinDataRequest"/>
+    </message>
+    <message name="setFlightBinDataResponse">
+        <part name="parameters" element="tns:responseStatus"/>
+    </message>
+
+    <portType name="BixServicePortType">
+        <operation name="SetBagCheckInData">
+            <input message="tns:setBagCheckInDataRequest"/>
+            <output message="tns:setBagCheckInDataResponse"/>
+        </operation>
+        <operation name="SetBagEventData">
+            <input message="tns:setBagEventDataRequest"/>
+            <output message="tns:setBagEventDataResponse"/>
+        </operation>
+        <operation name="SetBagLostData">
+            <input message="tns:setBagLostDataRequest"/>
+            <output message="tns:setBagLostDataResponse"/>
+        </operation>
+        <operation name="SetBagScanData">
+            <input message="tns:setBagScanDataRequest"/>
+            <output message="tns:setBagScanDataResponse"/>
+        </operation>
+        <operation name="SetBhsEventData">
+            <input message="tns:setBhsEventDataRequest"/>
+            <output message="tns:setBhsEventDataResponse"/>
+        </operation>
+        <operation name="SetBimData">
+            <input message="tns:setBimDataRequest"/>
+            <output message="tns:setBimDataResponse"/>
+        </operation>
+        <operation name="SetFlightBinData">
+            <input message="tns:setFlightBinDataRequest"/>
+            <output message="tns:setFlightBinDataResponse"/>
+        </operation>
+    </portType>
+
+    <binding name="BixServiceBinding" type="tns:BixServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="SetBagCheckInData">
+            <soap:operation soapAction="SetBagCheckInData" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="SetBagEventData">
+            <soap:operation soapAction="SetBagEventData" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="SetBagLostData">
+            <soap:operation soapAction="SetBagLostData" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="SetBagScanData">
+            <soap:operation soapAction="SetBagScanData" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="SetBhsEventData">
+            <soap:operation soapAction="SetBhsEventData" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="SetBimData">
+            <soap:operation soapAction="SetBimData" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="SetFlightBinData">
+            <soap:operation soapAction="SetFlightBinData" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+
+
+    </binding>
+
+    <service name="BixService">
+        <port name="BixServicePort" binding="tns:BixServiceBinding">
+            <soap:address location="http://localhost:8181/BixService"/>
+        </port>
+    </service>
+</definitions>

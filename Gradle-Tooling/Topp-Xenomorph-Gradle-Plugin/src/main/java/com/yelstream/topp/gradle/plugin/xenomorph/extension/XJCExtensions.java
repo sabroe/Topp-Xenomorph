@@ -55,7 +55,7 @@ public class XJCExtensions {
                                                       SourceSet sourceSet) {
         ExtensionContainer extensions=project.getExtensions();
         String name=SourceSets.NameStrategy.ShortConvention.toString("xjc",SourceSets.toShortName(sourceSet));
-        return extensions.create(name,XJCExtension.class,project);
+        return extensions.create(name,XJCExtension.class,project,sourceSet);
     }
 
     private static XJCExtension createSourceSetExtension(Project project,

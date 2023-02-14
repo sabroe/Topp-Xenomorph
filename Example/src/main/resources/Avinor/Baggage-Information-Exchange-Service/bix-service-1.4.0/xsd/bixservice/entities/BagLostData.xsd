@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../../basictypes/AirportIATA.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagIrregularityCode.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagTagNumber.xsd"/>
+    <xs:include schemaLocation="../../basictypes/DateUTC.xsd"/>
+    <xs:include schemaLocation="../../basictypes/FlightId.xsd"/>
+    <xs:include schemaLocation="../../basictypes/JsonData.xsd"/>
+
+    <xs:complexType name="BagLostData">
+        <xs:sequence>
+            <xs:element name="bagTagNumber" type="BagTagNumber"/>
+            <xs:element name="bagIrregularityCode" type="BagIrregularityCode" minOccurs="0"/>
+            <xs:element name="bagLostAirportIATA" type="AirportIATA" minOccurs="0"/>
+            <xs:element name="bagLostDate" type="DateUTC" minOccurs="0"/>
+            <xs:element name="bagLostFlightId" type="FlightId" minOccurs="0"/>
+            <xs:element name="bagLostAdditionalData" type="JsonData" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

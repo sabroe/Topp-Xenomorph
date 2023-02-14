@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="CorrelationId.xsd"/>
+    <xs:include schemaLocation="SourceOrganization.xsd"/>
+    <xs:include schemaLocation="SourceSystem.xsd"/>
+    <xs:include schemaLocation="SourceTimestamp.xsd"/>
+
+    <xs:complexType name="TransData">
+        <xs:sequence>
+            <xs:element name="correlationId" type="CorrelationId"/>
+            <xs:element name="sourceOrganization" type="SourceOrganization"/>
+            <xs:element name="sourceSystem" type="SourceSystem"/>
+            <xs:element name="sourceTimestamp" type="SourceTimestamp"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

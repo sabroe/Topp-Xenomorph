@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../../basictypes/AirlineIATAThreeNumeric.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagTagLeadingDigit.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagTagNumber.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagTagSerialNumber.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagTagNumberGDPR.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagTagUnique.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagTagStatus.xsd"/>
+
+    <xs:complexType name="BagTagData">
+        <xs:sequence>
+            <xs:element name="bagTagNumber" type="BagTagNumber"/>
+            <xs:element name="bagTagLeadingDigit" type="BagTagLeadingDigit"/>
+            <xs:element name="bagTagIssuerCode" type="AirlineIATAThreeNumeric"/>
+            <xs:element name="bagTagSerialNumber" type="BagTagSerialNumber"/>
+            <xs:element name="bagTagNumberGDPR" type="BagTagNumberGDPR" minOccurs="0" />
+            <xs:element name="bagTagUnique" type="BagTagUnique" minOccurs="0" />
+            <xs:element name="bagTagStatus" type="BagTagStatus" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

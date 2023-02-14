@@ -1,10 +1,13 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.extension;
 
+import com.yelstream.topp.gradle.api.SourceSets;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.gradle.api.Project;
+import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.tasks.SourceSet;
 
 /**
@@ -23,8 +26,15 @@ public class XenomorphExtensions {
      */
     private final Project project;
 
+    private XenomorphExtension xenomorphExtension;
+
     public void register(SourceSet sourceSet) {
-//
+if (xenomorphExtension==null) {
+        ExtensionContainer extensions=project.getExtensions();
+        xenomorphExtension=extensions.create("xenomorph",XenomorphExtension.class);
+System.out.println("xenomorphExtension: "+xenomorphExtension);
+System.out.println("(xenomorphExtension instanceof ExtensionAware: "+(xenomorphExtension instanceof ExtensionAware));
+}
     }
 
     /**

@@ -1,7 +1,7 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.tool;
 
 import com.sun.tools.xjc.Driver;
-import com.yelstream.topp.command.Argument;
+import com.yelstream.topp.command.Arguments;
 import com.yelstream.topp.command.Command;
 import com.yelstream.topp.command.CommandInitiator;
 import com.yelstream.topp.command.Result;
@@ -29,7 +29,7 @@ public class XJCUtility {
 
     public static CommandInitiator createCommandInitiator(List<String> arguments,
                                                           IntConsumer statusConsumer) {
-        Argument argument=new Argument(arguments);
+        Arguments argument=new Arguments(arguments);
         return CommandInitiator.createCommandInitiator(argument,XJCUtility::run,statusConsumer);
     }
 

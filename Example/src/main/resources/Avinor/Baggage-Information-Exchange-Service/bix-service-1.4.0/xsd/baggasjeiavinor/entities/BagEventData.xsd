@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0.0">
+
+    <xs:include schemaLocation="../../basictypes/AirportIATA.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagEventCode.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagEventDescription.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagEventErrorCode.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagLocation.xsd"/>
+    <xs:include schemaLocation="../../basictypes/TimestampUTC.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BEBFT.xsd"/>
+    <xs:include schemaLocation="../../basictypes/BagLocation.xsd"/>
+
+    <xs:complexType name="BagEventData">
+        <xs:sequence>
+            <xs:element name="bagEventCode" type="BagEventCode"/>
+            <xs:element name="bagEventTimestamp" type="TimestampUTC"/>
+            <xs:element name="bagEventDescription" type="BagEventDescription" minOccurs="0"/>
+            <xs:element name="bagEventAirportIATA" type="AirportIATA" minOccurs="0"/>
+            <xs:element name="bagEventLocation" type="BagLocation" minOccurs="0"/>
+            <xs:element name="bagEventErrorCode" type="BagEventErrorCode" minOccurs="0"/>
+            <xs:element name="BEBFT" type="BEBFT" minOccurs="0"/>
+            <xs:element name="bagPlannedBin" type="BagLocation" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

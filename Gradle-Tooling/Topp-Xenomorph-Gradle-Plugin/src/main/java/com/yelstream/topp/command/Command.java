@@ -29,7 +29,7 @@ public class Command implements Closeable {
     /**
      * Command arguments.
      */
-    private Argument argument;
+    private Arguments arguments;
 
     /**
      * Command output, comparable to the standard output of a process.

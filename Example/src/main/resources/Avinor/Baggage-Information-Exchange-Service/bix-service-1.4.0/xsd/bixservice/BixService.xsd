@@ -1,0 +1,83 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:ddef="http://www.asrv.aero/webservices/1.1/BIXService/datadefinitions"
+           targetNamespace="http://www.asrv.aero/webservices/1.1/BIXService"
+           elementFormDefault="qualified"
+           version="1.0.0">
+
+    <xs:import namespace="http://www.asrv.aero/webservices/1.1/BIXService/datadefinitions"
+               schemaLocation="BixServiceTypes.xsd"/>
+
+    <xs:element name="setBagCheckInDataRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="transData" type="ddef:TransData"/>
+                <xs:element name="bagCheckInData" type="ddef:BagCheckInData"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="setBagEventDataRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="transData" type="ddef:TransData"/>
+                <xs:element name="bagEventData" type="ddef:BagEventData"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="setBagLostDataRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="transData" type="ddef:TransData"/>
+                <xs:element name="bagLostData" type="ddef:BagLostData"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="setBagScanDataRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="transData" type="ddef:TransData"/>
+                <xs:element name="bagScanData" type="ddef:BagScanData"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="setBhsEventDataRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="transData" type="ddef:TransData"/>
+                <xs:element name="bhsEventData" type="ddef:BhsEventData"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="setBimDataRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="transData" type="ddef:TransData"/>
+                <xs:element name="bimData" type="ddef:BimData"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="setFlightBinDataRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="transData" type="ddef:TransData"/>
+                <xs:element name="flightBinData" type="ddef:FlightBinData"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+
+    <xs:element name="responseStatus">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="statusCode" type="ddef:ResponseStatusCode"/>
+                <xs:element name="statusText" type="ddef:ResponseStatusText" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
