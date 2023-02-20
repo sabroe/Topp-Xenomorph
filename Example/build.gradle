@@ -38,7 +38,7 @@ sourceSets{
     sourceSets {
         main {
             xjc {
-                resource.defaultResourceDir = project.file('src/main/resources/Avinor/Baggage-Information-Exchange-Service/bix-service-1.4.0')
+                resource.defaultResourceDir = resource.file('Avinor/Baggage-Information-Exchange-Service/bix-service-1.4.0')
                 run {
                     name = 'Avinor - Baggage Information Exchange Service'
                     enable = true

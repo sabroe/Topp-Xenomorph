@@ -3,7 +3,6 @@ package com.yelstream.topp.gradle.api;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.Singular;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.PathValidation;
@@ -56,7 +55,6 @@ public class ResourceFactory {
     private final LogLevel level=LogLevel.INFO;
 
     @Getter
-    @Setter
     private File defaultResourceDir;
 
     protected Logger getLogger() {
@@ -163,8 +161,6 @@ public class ResourceFactory {
                 LogLevel level=resourceFactory.level;
                 File resourceDirectory=resourceFactory.getDefaultResourceDir();
 
-                //TODO: Resolve according to main source-set!
-
                 if (resourceDirectory!=null) {
                     File candicateFile=new File(resourceDirectory,file.getPath());
                     if (logger.isEnabled(level)) {
@@ -173,6 +169,40 @@ public class ResourceFactory {
                     if (candicateFile.exists()) {
                         resolved=candicateFile;
                     }
+                }
+            }
+            return resolved;
+        }
+    }
+
+    @AllArgsConstructor(staticName="of")
+    public static class DivergentResourceResolver implements Resolver {
+        @Getter
+        private final SourceSet sourceSet;
+
+        @Getter
+        private final File subSourceSetDirectory;
+
+        private File getDivergentResourceDirectory(ResourceFactory resourceFactory) {
+            File projectDir=resourceFactory.getProject().getProjectDir();
+            File offsetDirectory=new File(projectDir,String.format("src/%s",sourceSet.getName()));
+            return new File(offsetDirectory,subSourceSetDirectory.getPath());
+        }
+
+        @Override
+        public File resolve(ResourceFactory resourceFactory,
+                            File file) {
+            File resolved=null;
+            {
+                Logger logger=resourceFactory.getLogger();
+                LogLevel level=resourceFactory.level;
+                File divergentResourceDirectory=getDivergentResourceDirectory(resourceFactory);
+                File candicateFile=new File(divergentResourceDirectory,file.getPath());
+                if (logger.isEnabled(level)) {
+                    logger.log(level,String.format("Trying to resolve file against divergent resource directory; file is %s, divergent resource directory is %s, candidate file is %s!",file,divergentResourceDirectory,candicateFile));
+                }
+                if (candicateFile.exists()) {
+                    resolved=candicateFile;
                 }
             }
             return resolved;

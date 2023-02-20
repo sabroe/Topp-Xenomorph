@@ -1,6 +1,5 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.extension;
 
-import com.yelstream.topp.gradle.api.ResourceFactory;
 import com.yelstream.topp.gradle.api.SourceSets;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -54,7 +53,7 @@ public class SchemaGenExtensions {
                                                             SourceSet sourceSet) {
         ExtensionContainer extensions=project.getExtensions();
         String name=SourceSets.NameStrategy.ShortConvention.toString("jxc",sourceSet.getName());
-        return extensions.create(name,SchemaGenExtension.class,project);
+        return extensions.create(name,SchemaGenExtension.class,project,sourceSet);
     }
 
     private static SchemaGenExtension createSourceSetExtension(Project project,

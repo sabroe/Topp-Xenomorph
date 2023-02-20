@@ -23,11 +23,6 @@ public class SchemaGenExtension {
     public static final String EXTENSION_NAME="schemaGen";
 
 
-    public SchemaGenExtension(Project project) {
-        this.project=project;
-        resource=ResourceFactory.of(project);
-    }
-
     public SchemaGenExtension(Project project,
                               SourceSet sourceSet) {
         this.project=project;

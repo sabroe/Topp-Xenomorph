@@ -30,16 +30,10 @@ public class XJCExtension {
      */
     public static final String EXTENSION_NAME="xjc";
 
-    public XJCExtension(Project project) {
-        this.project=project;
-        resource=ResourceFactory.of(project);
-        schema=new SchemaReferenceFactory(project);
-    }
-
     public XJCExtension(Project project,
                         SourceSet sourceSet) {
         this.project=project;
-        resource=ResourceFactory.of(project,sourceSet);
+        resource=ResourceFactory.of(project,sourceSet).toBuilder().resolver(ResourceFactory.DivergentResourceResolver.of(sourceSet,new File("schema"))).build();
         schema=new SchemaReferenceFactory(project);
     }
 
