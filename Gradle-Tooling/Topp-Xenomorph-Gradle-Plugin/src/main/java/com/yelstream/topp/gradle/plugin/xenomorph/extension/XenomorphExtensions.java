@@ -32,8 +32,8 @@ public class XenomorphExtensions {
 if (xenomorphExtension==null) {
         ExtensionContainer extensions=project.getExtensions();
         xenomorphExtension=extensions.create("xenomorph",XenomorphExtension.class);
-System.out.println("xenomorphExtension: "+xenomorphExtension);
-System.out.println("(xenomorphExtension instanceof ExtensionAware: "+(xenomorphExtension instanceof ExtensionAware));
+//System.out.println("xenomorphExtension: "+xenomorphExtension);
+//System.out.println("(xenomorphExtension instanceof ExtensionAware: "+(xenomorphExtension instanceof ExtensionAware));
 }
     }
 

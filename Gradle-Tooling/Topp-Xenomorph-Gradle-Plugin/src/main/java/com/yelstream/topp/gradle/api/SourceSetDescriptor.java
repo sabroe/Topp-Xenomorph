@@ -32,19 +32,19 @@ public class SourceSetDescriptor {
 
     /**
      * For the given source-set, the name of the associated "classes" task.
-     * @See <a href="https://docs.gradle.org/current/userguide/java_plugin.html#java_source_set_tasks">SourceSet Tasks</a>
+     * @see <a href="https://docs.gradle.org/current/userguide/java_plugin.html#java_source_set_tasks">SourceSet Tasks</a>
      */
     private final String classesTaskName;
 
     /**
      * For the given source-set, the name of the associated "processResources" task.
-     * @See <a href="https://docs.gradle.org/current/userguide/java_plugin.html#java_source_set_tasks">SourceSet Tasks</a>
+     * @see <a href="https://docs.gradle.org/current/userguide/java_plugin.html#java_source_set_tasks">SourceSet Tasks</a>
      */
     private final String processResourcesTaskName;
 
     /**
      * For the given source-set, the name of the associated "compileJava" task.
-     * @See <a href="https://docs.gradle.org/current/userguide/java_plugin.html#java_source_set_tasks">SourceSet Tasks</a>
+     * @see <a href="https://docs.gradle.org/current/userguide/java_plugin.html#java_source_set_tasks">SourceSet Tasks</a>
      */
     private final String compileJavaTaskName;
 

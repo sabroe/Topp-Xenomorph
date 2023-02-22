@@ -1,6 +1,6 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.extension;
 
-import com.yelstream.topp.gradle.api.ResourceFactory;
+import com.yelstream.topp.grind.gradle.api.ResourceFactory;
 import com.yelstream.topp.gradle.plugin.xenomorph.util.SchemaReference;
 import com.yelstream.topp.gradle.plugin.xenomorph.util.SchemaReferenceFactory;
 import groovy.lang.Closure;

@@ -1,6 +1,6 @@
 package com.yelstream.topp.gradle.plugin.xenomorph.extension;
 
-import com.yelstream.topp.gradle.api.ResourceFactory;
+import com.yelstream.topp.grind.gradle.api.ResourceFactory;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
