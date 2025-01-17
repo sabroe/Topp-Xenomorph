@@ -13,7 +13,8 @@ module com.yelstream.topp.gradle.plugin.xenomorph {
     requires jakarta.xml.bind;
     requires com.sun.xml.bind.core;
     requires com.sun.xml.bind;
-//    requires com.sun.tools.jxc;
+    requires com.sun.tools.jxc;
+    requires com.sun.tools.xjc;
 */
 
     exports org.gradle.api;
