@@ -160,7 +160,7 @@ public abstract class XJCTask extends DefaultTask {
         setGroup(GROUP_NAME);
 
         Project project=getProject();
-        File buildDir=project.getBuildDir();
+        File buildDir=project.getLayout().getBuildDirectory().get().getAsFile();
 
         xjcDependencies=pluginConfigurations.getXjcConfigurations().getConfigurationProvider(sourceSet.getName());
 
@@ -324,8 +324,11 @@ XJCExtension extension2=eg.getSourceSetExtension();
             XJCExtension.Run.Option option=run.getOption();  //TODO: Rename to .... runOption
             XJCExtension.Run.Extension extensions=run.getExtension();  //TODO: Rename to .... runExtension
 
-            File buildDir=project.getBuildDir();
-            Path buildDirectoryPath=project.getBuildDir().toPath();
+//            File buildDir=project.getBuildDir();
+//            Path buildDirectoryPath=project.getBuildDir().toPath();
+            File buildDir=project.getLayout().getBuildDirectory().get().getAsFile();
+            Path buildDirectoryPath=buildDir.toPath();
+
             Path projectDir=project.getProjectDir().toPath();
 
             List<String> args=new ArrayList<>();
