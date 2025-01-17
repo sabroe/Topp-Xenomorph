@@ -100,6 +100,6 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.6'
 
     //See https://eclipse-ee4j.github.io/jaxb-ri/ !
-    api 'jakarta.annotation:jakarta.annotation-api:2.1.1'  //Necessary for e.g. @Generated as 'jakarta.annotation.Generated'!
-    api 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+    api 'jakarta.annotation:jakarta.annotation-api:3.0.0'  //Necessary for e.g. @Generated as 'jakarta.annotation.Generated'!
+    api 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.2'
 }

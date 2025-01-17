@@ -5,7 +5,7 @@ module com.yelstream.topp.jakarta.jaxb {
     requires static lombok;
     requires jakarta.annotation;
     requires jakarta.activation;
-    requires com.sun.activation.registries;
+//    requires com.sun.activation.registries;
     requires jakarta.xml.bind;
     requires com.sun.xml.bind.core;
     requires com.sun.xml.bind;

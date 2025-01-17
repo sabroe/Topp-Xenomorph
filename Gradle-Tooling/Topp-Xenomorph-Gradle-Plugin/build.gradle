@@ -56,9 +56,9 @@ dependencies {
 
     implementation 'io.github.sabroe.topp-grind:topp-grind-gradle-grinder-utility:0.3.0'
 
-    implementation 'com.sun.xml.bind:jaxb-impl:4.0.1'
-    implementation 'com.sun.xml.bind:jaxb-xjc:4.0.1'  //XJC
-    implementation 'com.sun.xml.bind:jaxb-jxc:4.0.1'  //SchemaGen
+    api 'com.sun.xml.bind:jaxb-impl:4.0.5'
+    api 'com.sun.xml.bind:jaxb-xjc:4.0.5'  //XJC
+    api 'com.sun.xml.bind:jaxb-jxc:4.0.5'  //SchemaGen
 }
 
 gradlePlugin {

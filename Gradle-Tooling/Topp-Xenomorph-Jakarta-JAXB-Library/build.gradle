@@ -19,4 +19,5 @@ dependencies {
     api 'com.sun.xml.bind:jaxb-core:4.0.5'
     api 'com.sun.xml.bind:jaxb-impl:4.0.5'
     api 'com.sun.xml.bind:jaxb-jxc:4.0.5'
+    api 'com.sun.xml.bind:jaxb-xjc:4.0.5'
 }
